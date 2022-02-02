@@ -138,7 +138,7 @@ async def candle_command(
             dragmode="pan",
             hovermode="x unified",
         )
-        fig.update_traces(xaxis='x1')
+        fig.update_traces(xaxis="x1")
         if interval != 1440:
             if futures in ticker.upper():
                 fig.update_xaxes(

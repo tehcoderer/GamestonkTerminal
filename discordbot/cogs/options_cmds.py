@@ -85,8 +85,8 @@ class SlashCommands(commands.Cog):
         ticker: str = commands.Param(autocomplete=ticker_autocomp),
         expiry: str = commands.Param(autocomplete=expiry_autocomp),
         opt_type: str = commands.Param(choices=["Calls", "Puts"]),
-        min_sp: Optional[float] = None,
-        max_sp: Optional[float] = None,
+        min_sp: float | None = None,
+        max_sp: float | None = None,
     ):
         """Open Interest
 
@@ -108,8 +108,8 @@ class SlashCommands(commands.Cog):
         inter: disnake.AppCmdInter,
         ticker: str = commands.Param(autocomplete=ticker_autocomp),
         expiry: str = commands.Param(autocomplete=expiry_autocomp),
-        min_sp: Optional[float] = None,
-        max_sp: Optional[float] = None,
+        min_sp: float | None = None,
+        max_sp: float | None = None,
     ):
         """Open Interest
 
@@ -154,8 +154,7 @@ class SlashCommands(commands.Cog):
 
     @commands.slash_command(name="earnings")
     async def earnings(self, inter: disnake.AppCmdInter):
-        """Display Upcoming Earnings. [Source: Seeking Alpha]
-        """
+        """Display Upcoming Earnings. [Source: Seeking Alpha]"""
         await inter.response.defer()
         logger.info("earnings")
         await earnings_command(inter)
@@ -213,8 +212,8 @@ class SlashCommands(commands.Cog):
         inter: disnake.AppCmdInter,
         ticker: str = commands.Param(autocomplete=ticker_autocomp),
         expiry: str = commands.Param(autocomplete=expiry_autocomp),
-        min_sp: Optional[float] = None,
-        max_sp: Optional[float] = None,
+        min_sp: float | None = None,
+        max_sp: float | None = None,
     ):
         """Options Overview
 

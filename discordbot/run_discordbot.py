@@ -1,4 +1,3 @@
-import asyncio
 import difflib
 import os
 import sys
@@ -13,13 +12,17 @@ from config_bot import logger
 
 app = FastAPI()
 
+
 # For next update
 @app.get("/")
 async def read_root():
     return {"Hello": str(gst_bot.user)}
 
 
-activity = disnake.Activity(type=disnake.ActivityType.watching, name="Gamestonk Terminal: https://github.com/GamestonkTerminal/GamestonkTerminal")
+activity = disnake.Activity(
+    type=disnake.ActivityType.watching,
+    name="Gamestonk Terminal: https://github.com/GamestonkTerminal/GamestonkTerminal",
+)
 
 
 def fancy_traceback(exc: Exception) -> str:

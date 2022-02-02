@@ -100,16 +100,16 @@ async def performance_command(
             df_screen.drop("Ticker")
 
             columns = []
-            optionss = [
-                disnake.SelectOption(label='Overview', value='0', emoji="🟢"),
+            choices = [
+                disnake.SelectOption(label="Overview", value="0", emoji="🟢"),
             ]
             initial_str = description + "Overview"
             i = 1
             for column in df_screen.columns.values:
                 menu = f"\nPage {i}: {column}"
                 initial_str += f"\nPage {i}: {column}"
-                optionss.append(
-                    disnake.SelectOption(label=menu, value=f'{i}', emoji="🟢"),
+                choices.append(
+                    disnake.SelectOption(label=menu, value=f"{i}", emoji="🟢"),
                 )
                 i += 1
             columns.append(
@@ -136,7 +136,7 @@ async def performance_command(
                     )
                 )
 
-            await ctx.send(embed=columns[0], view=Menu(columns, optionss))
+            await ctx.send(embed=columns[0], view=Menu(columns, choices))
 
     except Exception as e:
         embed = disnake.Embed(
