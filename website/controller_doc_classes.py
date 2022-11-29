@@ -260,6 +260,8 @@ class ControllerDoc:
     def get_command_parser(self, command: str) -> Optional[argparse.ArgumentParser]:
         """Get command parser"""
         if command not in self.cmd_parsers:
+            if "fred" in command:
+                print(f"command_parser: {self.cmd_parsers.keys()}")
             self._get_parser(command)
 
         if command in self.cmd_parsers:
@@ -272,6 +274,8 @@ class ControllerDoc:
 
     def _get_parser(self, command: str) -> None:
         """Get parser information from source"""
+        if "fred" in command:
+            print("In _get_parser")
 
         def mock_func(fparser: argparse.ArgumentParser, *args, **kwargs):
             if "fred" in command:
@@ -284,24 +288,31 @@ class ControllerDoc:
                 self.controller, "parse_known_args_and_warn", new=mock_func
             ) as _:
                 args = {}
+                if "fred" in command:
+                    print(f"Fred: {command}, {self.cmd_fullspec[command].args}")
 
                 fullspec = self.cmd_fullspec[command]
                 if "_" in fullspec.args:
+                    if "fred" in command:
+                        print(f"Fred: {command}, {fullspec.args}")
                     return
 
                 if len(fullspec.args) > 2:
                     args.update({arg: ["1234"] for arg in fullspec.args[2:]})
+                    if "fred" in command:
+                        print(f"Fred: {command}, {args}")
                 with patch("openbb_terminal.rich_config.console.print"):
                     try:
+                        if "fred" in command:
+                            print("In try")
                         _ = getattr(self.controller, command)(["--help"], **args)
+                        print("called")
                     except SystemExit:
                         pass
                     except Exception as e:
                         if "fred" in command:
                             print(f"Fred Exception: {command}, {e}")
         except Exception as e:
-            if isinstance(e, AttributeError):
-                return
             print(e)
 
     def get_all_command_parsers(self) -> None:
@@ -309,6 +320,7 @@ class ControllerDoc:
         for command in self.commands:
             if "fred" in command:
                 print("Fred in get_all_command_parsers()")
+                print(f"command_parser: {self.cmd_parsers.keys()}")
             self.get_command_parser(command)
 
     def has_commands(self) -> bool:
