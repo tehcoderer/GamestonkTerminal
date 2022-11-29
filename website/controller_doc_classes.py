@@ -232,6 +232,9 @@ class ControllerDoc:
         """Get commands"""
         commands = []
         for name, _ in getmembers(self.controller, predicate=inspect.ismethod):
+            if "economy" in self.trailmap:
+                if name.startswith("call_"):
+                    print(name)
 
             if name.startswith("call_") and name not in self.ignore:
                 func = getattr(self.controller, name)
