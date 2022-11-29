@@ -306,7 +306,7 @@ class ControllerDoc:
                             print("In try")
                         _ = getattr(self.controller, command)(["--help"], **args)
                         if "fred" in command:
-                            print("In try")
+                            print("Fred called")
                     except SystemExit:
                         pass
                     except Exception as e:
