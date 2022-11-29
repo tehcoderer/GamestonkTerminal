@@ -603,6 +603,7 @@ class EconomyController(BaseController):
                     if obbff.ENABLE_EXIT_AUTO_HELP:
                         self.print_help()
 
+    @check_api_key(["API_FRED_KEY"])
     def call_fred(self, other_args: List[str]):
         """Process fred command"""
         parser = argparse.ArgumentParser(
