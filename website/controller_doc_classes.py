@@ -279,6 +279,7 @@ class ControllerDoc:
         def mock_func(fparser: argparse.ArgumentParser, *args, **kwargs):
             if "fred" in command:
                 print(f"Fred: {command}, {fparser}")
+            print(f"{command} {fparser}")
             self.cmd_parsers[command] = fparser
             return
 
