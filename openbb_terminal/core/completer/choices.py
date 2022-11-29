@@ -135,12 +135,7 @@ def __get_command_func(controller, command: str):
 
     command = f"call_{command}"
     command_func = getattr(controller, command)
-    if hasattr(command_func, "__wrapped__"):
-        command_func = command_func.__wrapped__
-        if hasattr(command_func, "__wrapped__"):
-            command_func = command_func.__wrapped__
-            if hasattr(command_func, "__wrapped__"):
-                command_func = command_func.__wrapped__
+    command_func = unwrap(func=command_func)
 
     if isfunction(command_func):
         command_func = MethodType(command_func, controller)

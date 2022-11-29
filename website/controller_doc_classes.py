@@ -240,8 +240,7 @@ class ControllerDoc:
                     func = func.__wrapped__
                     if hasattr(func, "__wrapped__"):
                         func = func.__wrapped__
-                        if hasattr(func, "__wrapped__"):
-                            func = func.__wrapped__
+
                 self.cmd_funcs[name] = func
                 self.cmd_fullspec[name] = inspect.getfullargspec(func)
                 if "economy" in self.trailmap:
@@ -306,7 +305,8 @@ class ControllerDoc:
                         if "fred" in command:
                             print("In try")
                         _ = getattr(self.controller, command)(["--help"], **args)
-                        print("called")
+                        if "fred" in command:
+                            print("In try")
                     except SystemExit:
                         pass
                     except Exception as e:
