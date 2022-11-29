@@ -44,7 +44,9 @@ jobs:
       - name: Generate documentation
         run: |
           source $VENV
+          python --version
           pytest tests/website --autodoc
+          python --version
           python website/generate_sdk_markdown.py && python website/generate_terminal_markdown.py
 
       - name: Setup Node

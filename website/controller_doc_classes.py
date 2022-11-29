@@ -242,15 +242,17 @@ class ControllerDoc:
                         func = func.__wrapped__
                         if hasattr(func, "__wrapped__"):
                             func = func.__wrapped__
-                if "economy" in self.trailmap:
-                    if "fred" in name:
-                        print(f"Fred: {name}, {func}")
                 self.cmd_funcs[name] = func
                 self.cmd_fullspec[name] = inspect.getfullargspec(func)
-
+                if "economy" in self.trailmap:
+                    if "fred" in name:
+                        print(f"Fred FullSpec: {self.cmd_fullspec[name].args}")
                 if "_" not in self.cmd_fullspec[
                     name
                 ].args and "from openbb_terminal." not in inspect.getsource(func):
+                    if "economy" in self.trailmap:
+                        if "fred" in name:
+                            print(f"Fred: {name}, {func}")
                     commands.append(name)
 
         return commands
@@ -272,6 +274,8 @@ class ControllerDoc:
         """Get parser information from source"""
 
         def mock_func(fparser: argparse.ArgumentParser, *args, **kwargs):
+            if "fred" in command:
+                print(f"Fred: {command}, {fparser}")
             self.cmd_parsers[command] = fparser
             return
 
@@ -300,6 +304,8 @@ class ControllerDoc:
     def get_all_command_parsers(self) -> None:
         """Get all command parsers"""
         for command in self.commands:
+            if "fred" in command:
+                print("Fred in get_all_command_parsers()")
             self.get_command_parser(command)
 
     def has_commands(self) -> bool:
