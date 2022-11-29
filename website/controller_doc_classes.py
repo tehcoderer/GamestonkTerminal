@@ -296,6 +296,9 @@ class ControllerDoc:
                         _ = getattr(self.controller, command)(["--help"], **args)
                     except SystemExit:
                         pass
+                    except Exception as e:
+                        if "fred" in command:
+                            print(f"Fred Exception: {command}, {e}")
         except Exception as e:
             if isinstance(e, AttributeError):
                 return

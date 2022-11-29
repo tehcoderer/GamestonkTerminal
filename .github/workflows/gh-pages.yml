@@ -43,7 +43,7 @@ jobs:
 
       - name: Generate documentation
         run: |
-          source $VENV
+          source .venv/bin/activate
           python --version
           pytest tests/website --autodoc
           python --version
