@@ -3,50 +3,48 @@ __docformat__ = "numpy"
 # pylint:disable=too-many-lines,R1710,R0904,C0415,too-many-branches,unnecessary-dict-index-lookup
 
 import argparse
+import itertools
 import logging
 import os
-import itertools
 from datetime import date, datetime as dt
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import pandas as pd
 
-from openbb_terminal.custom_prompt_toolkit import NestedCompleter
-
-from openbb_terminal.decorators import check_api_key
 from openbb_terminal import feature_flags as obbff
-from openbb_terminal.decorators import log_start_end
+from openbb_terminal.custom_prompt_toolkit import NestedCompleter
+from openbb_terminal.decorators import check_api_key, log_start_end
 from openbb_terminal.economy import (
     alphavantage_view,
+    commodity_view,
+    econdb_model,
+    econdb_view,
     economy_helpers,
     finviz_model,
     finviz_view,
-    nasdaq_model,
-    nasdaq_view,
-    wsj_view,
-    econdb_view,
-    econdb_model,
-    fred_view,
     fred_model,
-    yfinance_model,
-    yfinance_view,
+    fred_view,
     investingcom_model,
     investingcom_view,
+    nasdaq_model,
+    nasdaq_view,
     plot_view,
-    commodity_view,
+    wsj_view,
+    yfinance_model,
+    yfinance_view,
 )
 from openbb_terminal.helper_funcs import (
     EXPORT_BOTH_RAW_DATA_AND_FIGURES,
     EXPORT_ONLY_FIGURES_ALLOWED,
     EXPORT_ONLY_RAW_DATA_ALLOWED,
+    list_from_str,
+    parse_and_split_input,
     print_rich_table,
     valid_date,
-    parse_and_split_input,
-    list_from_str,
 )
-from openbb_terminal.parent_classes import BaseController
-from openbb_terminal.rich_config import console, MenuText
 from openbb_terminal.menu import session
+from openbb_terminal.parent_classes import BaseController
+from openbb_terminal.rich_config import MenuText, console
 
 logger = logging.getLogger(__name__)
 
@@ -75,9 +73,7 @@ class EconomyController(BaseController):
         "edebt",
     ]
 
-    CHOICES_MENUS = [
-        "qa",
-    ]
+    CHOICES_MENUS = ["qa"]
 
     wsj_sortby_cols_dict = {c: None for c in ["ticker", "last", "change", "prevClose"]}
     map_period_list = ["1d", "1w", "1m", "3m", "6m", "1y"]
@@ -237,10 +233,7 @@ class EconomyController(BaseController):
                         if len(subset) > 1:
                             economicdata.append(",".join(subset[::-1]))
 
-                for argument in [
-                    "--y1",
-                    "--y2",
-                ]:
+                for argument in ["--y1", "--y2"]:
                     self.choices["plot"][argument] = {
                         option: None for option in economicdata
                     }
@@ -308,25 +301,15 @@ class EconomyController(BaseController):
         )
         if ns_parser:
             if not ns_parser.type:
-                wsj_view.display_overview(
-                    export=ns_parser.export,
-                )
+                wsj_view.display_overview(export=ns_parser.export)
             elif ns_parser.type == "indices":
-                wsj_view.display_indices(
-                    export=ns_parser.export,
-                )
+                wsj_view.display_indices(export=ns_parser.export)
             if ns_parser.type == "usbonds":
-                wsj_view.display_usbonds(
-                    export=ns_parser.export,
-                )
+                wsj_view.display_usbonds(export=ns_parser.export)
             if ns_parser.type == "glbonds":
-                wsj_view.display_glbonds(
-                    export=ns_parser.export,
-                )
+                wsj_view.display_glbonds(export=ns_parser.export)
             if ns_parser.type == "currencies":
-                wsj_view.display_currencies(
-                    export=ns_parser.export,
-                )
+                wsj_view.display_currencies(export=ns_parser.export)
 
     @log_start_end(log=logger)
     def call_futures(self, other_args: List[str]):
@@ -390,9 +373,7 @@ class EconomyController(BaseController):
             elif ns_parser.source == "WallStreetJournal":
                 if ns_parser.commodity:
                     console.print("[red]Commodity flag valid with Finviz only.[/red]")
-                wsj_view.display_futures(
-                    export=ns_parser.export,
-                )
+                wsj_view.display_futures(export=ns_parser.export)
 
     @log_start_end(log=logger)
     def call_map(self, other_args: List[str]):
@@ -429,8 +410,7 @@ class EconomyController(BaseController):
         ns_parser = self.parse_known_args_and_warn(parser, other_args)
         if ns_parser:
             finviz_view.display_performance_map(
-                period=ns_parser.s_period,
-                map_filter=ns_parser.s_type,
+                period=ns_parser.s_period, map_filter=ns_parser.s_type
             )
 
     @log_start_end(log=logger)
@@ -623,7 +603,6 @@ class EconomyController(BaseController):
                     if obbff.ENABLE_EXIT_AUTO_HELP:
                         self.print_help()
 
-    @check_api_key(["API_FRED_KEY"])
     def call_fred(self, other_args: List[str]):
         """Process fred command"""
         parser = argparse.ArgumentParser(
@@ -757,11 +736,7 @@ class EconomyController(BaseController):
             "plot the graphs together. [Source: Yahoo finance / FinanceDatabase]",
         )
         parser.add_argument(
-            "-i",
-            "--indices",
-            type=str,
-            dest="indices",
-            help="One or multiple indices",
+            "-i", "--indices", type=str, dest="indices", help="One or multiple indices"
         )
         parser.add_argument(
             "--show",
@@ -963,10 +938,7 @@ class EconomyController(BaseController):
 
                 if not df.empty:
                     self.DATASETS["treasury"] = pd.concat(
-                        [
-                            self.DATASETS["treasury"],
-                            df,
-                        ]
+                        [self.DATASETS["treasury"], df]
                     )
 
                     cols = []
@@ -1024,10 +996,7 @@ class EconomyController(BaseController):
             default=None,
         )
         ns_parser = self.parse_known_args_and_warn(
-            parser,
-            other_args,
-            export_allowed=EXPORT_ONLY_RAW_DATA_ALLOWED,
-            raw=True,
+            parser, other_args, export_allowed=EXPORT_ONLY_RAW_DATA_ALLOWED, raw=True
         )
         if ns_parser:
             country = ns_parser.country.lower().replace("_", " ")
@@ -1099,10 +1068,7 @@ class EconomyController(BaseController):
         )
 
         ns_parser = self.parse_known_args_and_warn(
-            parser,
-            other_args,
-            export_allowed=EXPORT_ONLY_RAW_DATA_ALLOWED,
-            raw=True,
+            parser, other_args, export_allowed=EXPORT_ONLY_RAW_DATA_ALLOWED, raw=True
         )
         if ns_parser:
             if ns_parser.countries:
@@ -1264,10 +1230,7 @@ class EconomyController(BaseController):
         if other_args and "-" not in other_args[0][0]:
             other_args.insert(0, "--y1")
         ns_parser = self.parse_known_args_and_warn(
-            parser,
-            other_args,
-            export_allowed=EXPORT_ONLY_RAW_DATA_ALLOWED,
-            limit=10,
+            parser, other_args, export_allowed=EXPORT_ONLY_RAW_DATA_ALLOWED, limit=10
         )
 
         if ns_parser:
@@ -1450,8 +1413,7 @@ class EconomyController(BaseController):
         )
         if ns_parser:
             alphavantage_view.realtime_performance_sector(
-                raw=ns_parser.raw,
-                export=ns_parser.export,
+                raw=ns_parser.raw, export=ns_parser.export
             )
 
     @log_start_end(log=logger)
