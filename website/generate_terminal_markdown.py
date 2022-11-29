@@ -56,8 +56,6 @@ def get_parser(ctrl: ControllerDoc) -> Dict[str, List[Dict[str, str]]]:
 
     commands = []
     for cmd, parser in ctrl.cmd_parsers.items():
-        if "fred" in cmd:
-            print(cmd, parser)
 
         actions = []
         for action in parser._actions:  # pylint: disable=protected-access

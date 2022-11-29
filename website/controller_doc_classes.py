@@ -17,6 +17,7 @@ from openbb_terminal.decorators import disable_check_api
 from openbb_terminal.parent_classes import BaseController, CryptoBaseController
 
 disable_check_api()
+
 DF_STOCK = pd.DataFrame.from_dict(
     data={
         pd.Timestamp("2020-11-30 00:00:00"): {
@@ -245,15 +246,10 @@ class ControllerDoc:
 
                 self.cmd_funcs[name] = func
                 self.cmd_fullspec[name] = inspect.getfullargspec(func)
-                if "economy" in self.trailmap:
-                    if "fred" in name:
-                        print(f"Fred FullSpec: {self.cmd_fullspec[name].args}")
+
                 if "_" not in self.cmd_fullspec[
                     name
                 ].args and "from openbb_terminal." not in inspect.getsource(func):
-                    if "economy" in self.trailmap:
-                        if "fred" in name:
-                            print(f"Fred: {name}, {func}")
                     commands.append(name)
 
         return commands
@@ -261,27 +257,17 @@ class ControllerDoc:
     def get_command_parser(self, command: str) -> Optional[argparse.ArgumentParser]:
         """Get command parser"""
         if command not in self.cmd_parsers:
-            if "fred" in command:
-                print(f"command_parser: {self.cmd_parsers.keys()}")
             self._get_parser(command)
 
         if command in self.cmd_parsers:
-            if "fred" in command:
-                print(f"Fred: {command}, {self.cmd_parsers[command]}")
-
             return self.cmd_parsers[command]
 
         return None
 
     def _get_parser(self, command: str) -> None:
         """Get parser information from source"""
-        if "fred" in command:
-            print("In _get_parser")
 
         def mock_func(fparser: argparse.ArgumentParser, *args, **kwargs):
-            if "fred" in command:
-                print(f"Fred: {command}, {fparser}")
-            print(f"{command} {fparser}")
             self.cmd_parsers[command] = fparser
             return
 
@@ -290,40 +276,24 @@ class ControllerDoc:
                 self.controller, "parse_known_args_and_warn", new=mock_func
             ) as _:
                 args = {}
-                if "fred" in command:
-                    print(f"Fred: {command}, {self.cmd_fullspec[command].args}")
-
                 fullspec = self.cmd_fullspec[command]
                 if "_" in fullspec.args:
-                    if "fred" in command:
-                        print(f"Fred: {command}, {fullspec.args}")
                     return
 
                 if len(fullspec.args) > 2:
                     args.update({arg: ["1234"] for arg in fullspec.args[2:]})
-                    if "fred" in command:
-                        print(f"Fred: {command}, {args}")
+
                 with patch("openbb_terminal.rich_config.console.print"):
                     try:
-                        if "fred" in command:
-                            print("In try")
                         _ = getattr(self.controller, command)(["--help"], **args)
-                        if "fred" in command:
-                            print("Fred called")
                     except SystemExit:
                         pass
-                    except Exception as e:
-                        if "fred" in command:
-                            print(f"Fred Exception: {command}, {e}")
         except Exception as e:
             print(e)
 
     def get_all_command_parsers(self) -> None:
         """Get all command parsers"""
         for command in self.commands:
-            if "fred" in command:
-                print("Fred in get_all_command_parsers()")
-                print(f"command_parser: {self.cmd_parsers.keys()}")
             self.get_command_parser(command)
 
     def has_commands(self) -> bool:
