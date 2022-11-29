@@ -232,9 +232,6 @@ class ControllerDoc:
         """Get commands"""
         commands = []
         for name, _ in getmembers(self.controller, predicate=inspect.ismethod):
-            if "economy" in self.trailmap:
-                if name.startswith("call_"):
-                    print(name)
 
             if name.startswith("call_") and name not in self.ignore:
                 func = getattr(self.controller, name)
@@ -243,7 +240,11 @@ class ControllerDoc:
                     func = func.__wrapped__
                     if hasattr(func, "__wrapped__"):
                         func = func.__wrapped__
-
+                        if hasattr(func, "__wrapped__"):
+                            func = func.__wrapped__
+                if "economy" in self.trailmap:
+                    if "fred" in name:
+                        print(f"Fred: {name}, {func}")
                 self.cmd_funcs[name] = func
                 self.cmd_fullspec[name] = inspect.getfullargspec(func)
 
@@ -260,6 +261,9 @@ class ControllerDoc:
             self._get_parser(command)
 
         if command in self.cmd_parsers:
+            if "fred" in command:
+                print(f"Fred: {command}, {self.cmd_parsers[command]}")
+
             return self.cmd_parsers[command]
 
         return None
@@ -289,6 +293,8 @@ class ControllerDoc:
                     except SystemExit:
                         pass
         except Exception as e:
+            if isinstance(e, AttributeError):
+                return
             print(e)
 
     def get_all_command_parsers(self) -> None:

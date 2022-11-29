@@ -5,6 +5,7 @@ from os import environ
 from types import MethodType
 from typing import Callable, List
 from unittest.mock import patch
+
 from openbb_terminal.helper_funcs import check_file_type_saved, check_positive
 from openbb_terminal.rich_config import get_ordered_list_sources
 
@@ -134,7 +135,12 @@ def __get_command_func(controller, command: str):
 
     command = f"call_{command}"
     command_func = getattr(controller, command)
-    command_func = unwrap(func=command_func)
+    if hasattr(command_func, "__wrapped__"):
+        command_func = command_func.__wrapped__
+        if hasattr(command_func, "__wrapped__"):
+            command_func = command_func.__wrapped__
+            if hasattr(command_func, "__wrapped__"):
+                command_func = command_func.__wrapped__
 
     if isfunction(command_func):
         command_func = MethodType(command_func, controller)
@@ -189,13 +195,11 @@ def __patch_controller_functions(controller):
     """
 
     bound_mock_parse_known_args_and_warn = MethodType(
-        __mock_parse_known_args_and_warn,
-        controller,
+        __mock_parse_known_args_and_warn, controller
     )
 
     rich = patch(
-        target="openbb_terminal.rich_config.ConsoleAndPanel.print",
-        return_value=None,
+        target="openbb_terminal.rich_config.ConsoleAndPanel.print", return_value=None
     )
 
     patcher_list = [
@@ -226,10 +230,7 @@ def __patch_controller_functions(controller):
         patcher.stop()
 
 
-def _get_argument_parser(
-    controller,
-    command: str,
-) -> ArgumentParser:
+def _get_argument_parser(controller, command: str) -> ArgumentParser:
     """Intercept the ArgumentParser instance from the command function.
 
     A command function being a function starting with `call_`, like:
@@ -310,8 +311,7 @@ def build_controller_choice_map(controller) -> dict:
     for command in command_list:
         try:
             argument_parser = _get_argument_parser(
-                controller=controller,
-                command=command,
+                controller=controller, command=command
             )
             controller_choice_map[command] = _build_command_choice_map(
                 argument_parser=argument_parser

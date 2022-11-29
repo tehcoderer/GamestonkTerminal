@@ -204,7 +204,7 @@ def main() -> bool:
         "[bright_yellow]Generating markdown files... Don't ignore any errors now[/bright_yellow]"
     )
     content_path = website_path / "content/terminal/reference"
-    terminal_ref = {}
+    terminal_ref: Dict = {}
 
     for file in content_path.glob("*"):
         if file.is_file():
