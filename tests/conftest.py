@@ -9,7 +9,7 @@ import importlib_metadata
 # IMPORTATION THIRDPARTY
 import matplotlib
 import pandas as pd
-import plotly  # pylint: disable=unused-import
+import plotly  # pylint: disable=unused-import  # noqa: F401
 import pytest
 from _pytest.capture import MultiCapture, SysCapture
 from _pytest.config import Config
