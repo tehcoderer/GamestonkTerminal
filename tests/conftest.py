@@ -351,7 +351,7 @@ def disable_matplotlib():
 
 def disable_plotly():
     # We add this to avoid multiple figures being opened
-    plotly.io.renderers.default = "none"
+    plotly.io.renderers.default = "json"
 
 
 def disable_check_api():
