@@ -9,6 +9,7 @@ import importlib_metadata
 # IMPORTATION THIRDPARTY
 import matplotlib
 import pandas as pd
+import plotly
 import pytest
 from _pytest.capture import MultiCapture, SysCapture
 from _pytest.config import Config
@@ -348,6 +349,11 @@ def disable_matplotlib():
     matplotlib.use("Agg")
 
 
+def disable_plotly():
+    # We add this to avoid multiple figures being opened
+    plotly.io.renderers.default = "none"
+
+
 def disable_check_api():
     decorators.disable_check_api()
 
@@ -364,6 +370,7 @@ def pytest_configure(config: Config) -> None:
     disable_rich()
     disable_check_api()
     disable_matplotlib()
+    disable_plotly()
 
 
 @pytest.fixture(scope="session")  # type: ignore
