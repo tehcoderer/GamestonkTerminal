@@ -3423,7 +3423,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "pywry"
-version = "0.1.8"
+version = "0.1.9"
 description = ""
 category = "main"
 optional = false

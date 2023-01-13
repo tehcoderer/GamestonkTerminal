@@ -19,16 +19,18 @@ build_type = (
 )
 
 # Local python environment packages folder
-venv_path = Path(sys.executable).parent.parent.resolve()
+# venv_path = Path(sys.executable).parent.parent.resolve()
 
 # Check if we are running in a conda environment
 if sys.prefix != sys.base_prefix and "conda" in sys.prefix:
     pathex = os.path.join(os.path.dirname(os.__file__), "site-packages")
-else:
-    if "site-packages" in list(venv_path.iterdir()):
-        pathex = str(venv_path / "site-packages")
-    else:
-        pathex = str(venv_path / "lib" / "site-packages")
+# else:
+#    if "site-packages" in list(venv_path.iterdir()):
+#        pathex = str(venv_path / "site-packages")
+#    else:
+#        pathex = str(venv_path / "lib" / "site-packages")
+
+pathex = os.path.join(os.path.dirname(os.__file__), "site-packages")
 
 # Removing unused ARM64 binary
 binary_to_remove = Path(os.path.join(pathex, "_scs_direct.cpython-39-darwin.so"))
@@ -78,8 +80,10 @@ added_files = [
     (".env", "."),
     (os.path.join(pathex, "blib2to3", "Grammar.txt"), "blib2to3"),
     (os.path.join(pathex, "blib2to3", "PatternGrammar.txt"), "blib2to3"),
-    (os.path.join(pathex, "scipy.libs"), "scipy.libs/"),
 ]
+if is_win:
+    added_files.append((os.path.join(pathex, "scipy.libs"), "scipy.libs/"))
+
 
 # Python libraries that are explicitly pulled into the bundle
 hidden_imports = [
@@ -154,7 +158,7 @@ pywry_exe = EXE(
     pywry_a.scripts,
     [],
     exclude_binaries=True,
-    name="pywry",
+    name="pywry_backend",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
