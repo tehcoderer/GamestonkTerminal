@@ -47,16 +47,30 @@ body {
 }
 
 .openbb_container {
-  align-items: center;
+  display: flex;
+  flex-flow: row wrap;
   width: 100%;
   height: 100%;
-  background-color: #000000;
-  position: absolute;
-  top: 0;
-  left: 0;
+  background-color: transparent;
+  align-items: stretch;
+  align-content: inherit;
 }
 
-.openbb_header {
+.openbb_container > * {
+  flex: 1 100%;
+
+}
+
+/* .openbb_container {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  row-gap: 0px;
+
+} */
+
+
+.openbb_container .openbb_header {
   position: relative;
   z-index: 99999999999;
   text-align: center;
@@ -65,14 +79,16 @@ body {
   box-sizing: border-box;
 }
 
-.plotly-graph-div {
-  width: 100%;
-  height: 89.6%;
+.openbb_container .plotly-graph-div {
   position: relative;
+  flex: inherit;
+  width: 100%;
+  height: 80%;
   font-size: 12px;
   font-size: 1.2rem;
   font-family: "Fira Code", monospace, "Arial Black";
   visibility: visible;
+  margin-bottom: 10px;
 }
 
 #changecolor {
@@ -183,10 +199,12 @@ body {
   margin-bottom: 10px;
 }
 
-.plotly-graph-div .modebar--hover .modebar-group {
+#modeBarContainer .modebar--hover .modebar-group {
+  display: flex !important;
   border: 2px solid #5a5a5a !important;
   border-radius: 4px;
   padding: 2px 2px 2px !important;
+  overflow: visible !important;
 }
 
 .modebar-group {
@@ -194,15 +212,18 @@ body {
   background-color: transparent !important;
 }
 
-.modebar {
+.modebar.vertical {
+  display: flex !important;
   z-index: 5000 !important;
-  position: fixed !important;
+  position: relative !important;
   bottom: 10px !important;
+  gap: 6px !important;
   top: auto !important;
   left: 50% !important;
   right: auto !important;
   align-items: center;
-  transform: translate(-50%, 10%) !important;
+  transform: translate(-50%, -10%);
+  overflow: visible !important;
 }
 
 @media screen and (max-width: 600px) {
@@ -217,8 +238,8 @@ body {
 }
 
 .modebar-group {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 1px;
+  margin-right: 1px;
   background: #0f0f0f !important;
   border: 1px solid #404040;
   box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06);
@@ -351,8 +372,9 @@ body {
   padding-bottom: 0px !important;
 }
 
-.modebar-container {
-  position: initial !important;
+.openbb_container .modebar-container {
+  display: flex;
+  position: relative !important;
 }
 
 .modebar-btn:hover .icon path {
@@ -1325,7 +1347,7 @@ video {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
-._header {
+.openbb_container ._header {
   background: #062d48;
   background: linear-gradient(90deg,
       #062d48,

@@ -38,7 +38,8 @@ function OpenBBMain(
   csvdiv,
   textdiv,
   titlediv,
-  downloaddiv
+  downloaddiv,
+  modeBarContainer
 ) {
   // Main function that plots the graphs and initializes the bar menus
   globals.CHART_DIV = chartdiv;
@@ -97,7 +98,7 @@ function OpenBBMain(
           },
         },
         {
-          name: "Download PNG (Ctrl+S)",
+          name: "Download Chart as Image (Ctrl+S)",
           icon: ICONS.downloadImage,
           click: async function () {
             await downloadImageButton();
@@ -262,19 +263,27 @@ function OpenBBMain(
   // We check for the dark mode
   if (graphs.layout.template.layout.mapbox.style == "dark") {
     document.body.style.backgroundColor = "#000000";
-    document.getElementById("openbb_footer").style.color = "#000000";
     graphs.layout.template.layout.paper_bgcolor = "#000000";
     graphs.layout.template.layout.plot_bgcolor = "#000000";
   } else {
     document.body.style.backgroundColor = "#FFFFFF";
-    document.getElementById("openbb_footer").style.color = "#FFFFFF";
+    modeBarContainer.style.color = "#FFFFFF";
   }
 
   // We set the plot config and plot the chart
   Plotly.setPlotConfig(CONFIG);
-  Plotly.react(globals.CHART_DIV, graphs, { responsive: true });
-  graphs.layout.automargin = false;
-  graphs.layout.autoexpand = false;
+
+  Plotly.react(globals.CHART_DIV, graphs, { responsive: true }).then(() => {
+    const modebar = globals.CHART_DIV.querySelectorAll(".modebar")[0];
+    modeBarContainer.appendChild(modebar);
+
+    const old = document.getElementsByClassName("modebar-container")[0];
+    old.parentNode.removeChild(old);
+  });
+
+  const modebar_buttons = document.getElementsByClassName("modebar-btn");
+  graphs.layout.automargin = true;
+  graphs.layout.autoexpand = true;
 
   let AXES = Object.keys(graphs.layout).filter(
     (x) => x.startsWith("xaxis") || x.startsWith("yaxis")
@@ -283,22 +292,36 @@ function OpenBBMain(
   // We set all the axes automargin to false
   if (AXES.length > 0) {
     AXES.forEach((axis) => {
-      graphs.layout[axis].automargin = false;
+      let margin = axis.startsWith("y") ? "l+r" : "t+b";
+      graphs.layout[axis].automargin = margin;
     });
     Plotly.react(globals.CHART_DIV, graphs, { responsive: true });
   }
 
   // Create global variables to for use later
-  const modebar = document.getElementsByClassName("modebar-container")[0];
-  const modebar_buttons = modebar.getElementsByClassName("modebar-btn");
+
   globals.barButtons = {};
+
+  const captureButtons = [
+    "Download CSV (Ctrl+Shift+C)",
+    "Download Chart as Image (Ctrl+S)",
+    "Overlay chart from CSV (Ctrl+O)",
+    "Add Text (Ctrl+T)",
+    "Change Titles (Ctrl+Shift+T)",
+    "Auto Scale (Ctrl+Shift+A)",
+    "Reset Axes"
+  ];
 
   for (let i = 0; i < modebar_buttons.length; i++) {
     // We add the buttons to the global variable for later use
     // and set the border to transparent so we can change the
     // color of the buttons when they are pressed
     let button = modebar_buttons[i];
-    button.classList.add("ph-capture");
+
+    if (captureButtons.includes(button.getAttribute("data-title"))) {
+      button.classList.add("ph-capture");
+    }
+
     button.style.border = "transparent";
     globals.barButtons[button.getAttribute("data-title")] = button;
   }
@@ -349,11 +372,17 @@ function OpenBBMain(
 
   function hideModebar() {
     if (globals.modebarHidden) {
-      modebar.style.display = "flex";
+      modeBarContainer.style.display = "flex";
       globals.modebarHidden = false;
+      globals.CHART_DIV.style.height = "80%";
+      document.getElementById("openbb_container").style.alignContent =
+        "inherit";
     } else {
-      modebar.style.display = "none";
+      modeBarContainer.style.display = "none";
       globals.modebarHidden = true;
+      globals.CHART_DIV.style.height = "100%";
+      document.getElementById("openbb_container").style.alignContent =
+        "baseline";
     }
   }
 
@@ -484,7 +513,10 @@ function OpenBBMain(
       } else if (e.shiftKey && e.key.toLowerCase() == "a") {
         e.preventDefault();
         autoscaleButton();
+      } else if (e.key.toLowerCase() == "w") {
+        window.close();
       }
+
     } else if (e.key == "Escape") {
       closePopup();
     }
@@ -544,11 +576,11 @@ function OpenBBMain(
         }
       });
 
-      modebar.style.display = "none";
+      modeBarContainer.style.display = "none";
       globals.modebarHidden = true;
     } else if (globals.modebarHidden) {
       // We show the modebar
-      modebar.style.display = "flex";
+      modeBarContainer.style.display = "flex";
       globals.modebarHidden = false;
 
       if (globals.old_nticks != undefined) {
@@ -595,6 +627,9 @@ function OpenBBMain(
   function changeTheme() {
     globals.dark_mode = !globals.dark_mode;
     document.body.style.backgroundColor = globals.dark_mode ? "#000" : "#fff";
+    modeBarContainer.style.backgroundColor = globals.dark_mode
+      ? "#000"
+      : "#fff";
     globals.CHART_DIV.layout.font.color = globals.dark_mode ? "#fff" : "#000";
 
     const changeIcon = globals.dark_mode ? ICONS.sunIcon : ICONS.moonIcon;

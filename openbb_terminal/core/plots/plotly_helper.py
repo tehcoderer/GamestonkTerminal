@@ -95,27 +95,20 @@ class TerminalStyle:
         self.plt_style = plt_style or self.plt_style
         self.load_available_styles()
         self.load_style(plt_style)
-        self.apply_console_style(console_style)
+        self.apply_console_style(console_style or "dark")
         self.apply_style()
 
-    def apply_console_style(self, style: Optional[str] = None) -> None:
+    def apply_console_style(self, style: Optional[str] = "") -> None:
         """Apply the style to the console."""
+        styles = self.console_styles_available
 
-        if style:
-            if style in self.console_styles_available:
-                json_path: Optional[Path] = self.console_styles_available[style]
-            else:
-                self.load_available_styles()
-                if style in self.console_styles_available:
-                    json_path = self.console_styles_available[style]
-                else:
-                    console.print(f"\nInvalid console style '{style}', using default.")
-                    json_path = self.console_styles_available.get("dark", None)
+        json_path: Optional[Path] = styles.get(style, styles.get("dark", None))
 
-            if json_path:
-                self.console_style = self.load_json_style(json_path)
-            else:
-                console.print("Error loading default.")
+        if json_path:
+            self.console_style = self.load_json_style(json_path)
+            return
+
+        console.print("Error loading default.")
 
     def apply_style(self, style: Optional[str] = "") -> None:
         """Apply the style to the libraries."""
@@ -247,8 +240,9 @@ class TerminalStyle:
         list
             List of colors e.g. ["#00ACFF", "#FF0000"]
         """
-        self.apply_style()
-        colors = self.plotly_template.get("layout", {}).get("colorway", PLT_COLORWAY)
+        colors = (
+            self.plotly_template.get("layout", {}).get("colorway", PLT_COLORWAY).copy()
+        )
         if reverse:
             colors.reverse()
         return colors
@@ -939,6 +933,7 @@ class OpenBBFigure(go.Figure):
                 showgrid=False,
                 showline=False,
                 zeroline=False,
+                layer="below traces",
                 tickfont=dict(size=ticksize),
             ),
             yaxis2=dict(
@@ -1087,6 +1082,7 @@ class OpenBBFigure(go.Figure):
                     self._exported = True
 
                 # We send the figure to the backend to be displayed
+                # return plots_backend().send_websocket_html()
                 return plots_backend().send_figure(self, export_image)
             except Exception:
                 # If the backend fails, we just show the figure normally

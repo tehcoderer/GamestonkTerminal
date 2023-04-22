@@ -13,6 +13,7 @@ from typing import Optional, Union
 import aiohttp
 import pandas as pd
 import plotly.graph_objects as go
+import psutil
 from packaging import version
 from reportlab.graphics import renderPDF
 
@@ -78,6 +79,7 @@ class Backend(PyWry):
             self.isatty = False
 
         self.WIDTH, self.HEIGHT = 1400, 762
+        self.websocket_server: bool = False
 
         atexit.register(self.close)
 
@@ -155,6 +157,8 @@ class Backend(PyWry):
             pywry_version=self.__version__,
             terminal_version=get_current_system().VERSION,
             python_version=get_current_system().PYTHON_VERSION,
+            port=9999,
+            collect_logs=get_current_system().LOG_COLLECT,
         )
 
     def send_figure(
@@ -173,16 +177,28 @@ class Backend(PyWry):
         # pylint: disable=C0415
         from openbb_terminal.helper_funcs import command_location
 
-        fig.layout.height += 69
-
         if export_image and isinstance(export_image, str):
             export_image = Path(export_image).resolve()
 
+        if not self.websocket_server:
+            websocket_process = psutil.Popen(
+                [
+                    sys.executable,
+                    "-m",
+                    "openbb_terminal.core.plots.websocket_server",
+                    "--port",
+                    "9999",
+                ],
+                env=os.environ,
+                shell=False,
+                stderr=subprocess.PIPE,
+            )
+            self.procs.append(websocket_process)
+            self.websocket_server = True
+
         json_data = json.loads(fig.to_json())
 
-        json_data.update(
-            self.get_json_update(),
-        )
+        json_data.update(self.get_json_update())
 
         self.outgoing.append(
             json.dumps(
