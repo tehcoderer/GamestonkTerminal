@@ -81,14 +81,14 @@ def dividends(
     return OBBject(results=Query(**locals()).execute())
 
 
-@router.command(model="CalendarEarnings")
-def earnings(
+@router.command(model="HistoricalEps")
+def historical_eps(
     cc: CommandContext,
     provider_choices: ProviderChoices,
     standard_params: StandardParams,
     extra_params: ExtraParams,
 ) -> OBBject[BaseModel]:
-    """Historical Earnings for a given company."""
+    """Historical earnings-per-share for a given company."""
     return OBBject(results=Query(**locals()).execute())
 
 
@@ -100,6 +100,28 @@ def employee_count(
     extra_params: ExtraParams,
 ) -> OBBject[BaseModel]:
     """Historical Employees. Historical number of employees."""
+    return OBBject(results=Query(**locals()).execute())
+
+
+@router.command(model="SearchFinancialAttributes")
+def search_financial_attributes(
+    cc: CommandContext,
+    provider_choices: ProviderChoices,
+    standard_params: StandardParams,
+    extra_params: ExtraParams,
+) -> OBBject[BaseModel]:
+    """Search financial attributes for financial statements."""
+    return OBBject(results=Query(**locals()).execute())
+
+
+@router.command(model="FinancialAttributes")
+def financial_attributes(
+    cc: CommandContext,
+    provider_choices: ProviderChoices,
+    standard_params: StandardParams,
+    extra_params: ExtraParams,
+) -> OBBject[BaseModel]:
+    """Fetch the value of financial attributes for a selected company and fiscal period."""
     return OBBject(results=Query(**locals()).execute())
 
 
@@ -213,14 +235,14 @@ def filings(
     return OBBject(results=Query(**locals()).execute())
 
 
-@router.command(model="HistoricalStockSplits")
+@router.command(model="HistoricalSplits")
 def historical_splits(
     cc: CommandContext,
     provider_choices: ProviderChoices,
     standard_params: StandardParams,
     extra_params: ExtraParams,
 ) -> OBBject[BaseModel]:
-    """Historical Stock Splits. Historical stock splits data."""
+    """Historical Splits. Historical splits data."""
     return OBBject(results=Query(**locals()).execute())
 
 
@@ -232,4 +254,15 @@ def transcript(
     extra_params: ExtraParams,
 ) -> OBBject[BaseModel]:
     """Earnings Call Transcript. Earnings call transcript for a given company."""
+    return OBBject(results=Query(**locals()).execute())
+
+
+@router.command(model="TrailingDividendYield")
+def trailing_dividend_yield(
+    cc: CommandContext,
+    provider_choices: ProviderChoices,
+    standard_params: StandardParams,
+    extra_params: ExtraParams,
+) -> OBBject[BaseModel]:
+    """Trailing 1yr dividend yield."""
     return OBBject(results=Query(**locals()).execute())
