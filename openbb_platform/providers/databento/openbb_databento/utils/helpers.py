@@ -1,4 +1,5 @@
 """Databento Helper Utility Functions"""
+
 import datetime
 
 import databento as db
@@ -117,6 +118,7 @@ def get_options_chain(symbol: str, date: str, key: str) -> pd.DataFrame:
         start=f"{date}T00:00:00",
         end=f"{date}T23:59:59",
         schema="ohlcv-1d",
+        limit=1000,
     )
     df = data.to_df()
     df[["ticker", "expiration", "type", "strike"]] = df.apply(
