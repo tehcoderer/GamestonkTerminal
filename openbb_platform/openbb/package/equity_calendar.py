@@ -1,7 +1,7 @@
 ### THIS FILE IS AUTO-GENERATED. DO NOT EDIT. ###
 
 import datetime
-from typing import List, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
 from openbb_core.app.model.custom_parameter import OpenBBCustomParameter
 from openbb_core.app.model.obbject import OBBject
@@ -44,9 +44,9 @@ class ROUTER_equity_calendar(Container):
 
         Parameters
         ----------
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
@@ -56,7 +56,7 @@ class ROUTER_equity_calendar(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPCalendarDividend], Tag(tag='fmp')]]
+            results : List[CalendarDividend]
                 Serializable results.
             provider : Optional[Literal['fmp']]
                 Provider name.
@@ -98,7 +98,11 @@ class ROUTER_equity_calendar(Container):
             "/equity/calendar/dividend",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/calendar/dividend",
+                        ("fmp",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -130,9 +134,9 @@ class ROUTER_equity_calendar(Container):
 
         Parameters
         ----------
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
@@ -142,7 +146,7 @@ class ROUTER_equity_calendar(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPCalendarEarnings], Tag(tag='fmp')]]
+            results : List[CalendarEarnings]
                 Serializable results.
             provider : Optional[Literal['fmp']]
                 Provider name.
@@ -188,7 +192,11 @@ class ROUTER_equity_calendar(Container):
             "/equity/calendar/earnings",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/calendar/earnings",
+                        ("fmp",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -202,8 +210,7 @@ class ROUTER_equity_calendar(Container):
     def ipo(
         self,
         symbol: Annotated[
-            Union[str, None, List[str]],
-            OpenBBCustomParameter(description="Symbol to get data for."),
+            Optional[str], OpenBBCustomParameter(description="Symbol to get data for.")
         ] = None,
         start_date: Annotated[
             Union[datetime.date, None, str],
@@ -230,9 +237,9 @@ class ROUTER_equity_calendar(Container):
         ----------
         symbol : Optional[str]
             Symbol to get data for.
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         limit : Optional[int]
             The number of data entries to return.
@@ -250,7 +257,7 @@ class ROUTER_equity_calendar(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[IntrinioCalendarIpo], Tag(tag='intrinio')]]
+            results : List[CalendarIpo]
                 Serializable results.
             provider : Optional[Literal['intrinio']]
                 Provider name.
@@ -353,10 +360,14 @@ class ROUTER_equity_calendar(Container):
             "/equity/calendar/ipo",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/calendar/ipo",
+                        ("intrinio",),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                     "start_date": start_date,
                     "end_date": end_date,
                     "limit": limit,
@@ -387,9 +398,9 @@ class ROUTER_equity_calendar(Container):
 
         Parameters
         ----------
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
@@ -399,7 +410,7 @@ class ROUTER_equity_calendar(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPCalendarSplits], Tag(tag='fmp')]]
+            results : List[CalendarSplits]
                 Serializable results.
             provider : Optional[Literal['fmp']]
                 Provider name.
@@ -433,7 +444,11 @@ class ROUTER_equity_calendar(Container):
             "/equity/calendar/splits",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/calendar/splits",
+                        ("fmp",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,

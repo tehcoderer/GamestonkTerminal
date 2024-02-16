@@ -53,9 +53,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['fred']]
                 The provider to use for the query, by default None.
@@ -67,7 +67,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDAMERIBOR], Tag(tag='fred')]]
+                results : List[AMERIBOR]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -88,14 +88,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.ameribor()
+            >>> obb.fixedincome.rate.ameribor(parameter="30_day_ma").to_df()
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/ameribor",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/ameribor",
+                        ("fred",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -133,9 +137,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['fred']]
                 The provider to use for the query, by default None.
@@ -147,7 +151,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDDiscountWindowPrimaryCreditRate], Tag(tag='fred')]]
+                results : List[DiscountWindowPrimaryCreditRate]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -168,14 +172,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.dpcredit()
+            >>> obb.fixedincome.rate.dpcredit(start_date="2023-02-01", end_date="2023-05-01").to_df()
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/dpcredit",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/dpcredit",
+                        ("fred",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -219,9 +227,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             interest_rate_type : Literal['deposit', 'lending', 'refinancing']
                 The type of interest rate.
@@ -233,7 +241,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDEuropeanCentralBankInterestRates], Tag(tag='fred')]]
+                results : List[EuropeanCentralBankInterestRates]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -254,14 +262,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.ecb(interest_rate_type="lending")
+            >>> obb.fixedincome.rate.ecb(interest_rate_type="refinancing")
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/ecb",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/ecb",
+                        ("fred",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -299,9 +311,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['federal_reserve', 'fred']]
                 The provider to use for the query, by default None.
@@ -313,7 +325,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FederalReserveFED], Tag(tag='federal_reserve')], Annotated[List[FREDFED], Tag(tag='fred')]]
+                results : List[FEDFUNDS]
                     Serializable results.
                 provider : Optional[Literal['federal_reserve', 'fred']]
                     Provider name.
@@ -334,14 +346,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.effr()
+            >>> obb.fixedincome.rate.effr(parameter="daily", provider="fred").to_df()
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/effr",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/effr",
+                        ("federal_reserve", "fred"),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -375,7 +391,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDPROJECTION], Tag(tag='fred')]]
+                results : List[PROJECTIONS]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -408,14 +424,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.effr_forecast()
+            >>> obb.fixedincome.rate.effr_forecast(long_run=True)
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/effr_forecast",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/effr_forecast",
+                        ("fred",),
+                    )
                 },
                 standard_params={},
                 extra_params=kwargs,
@@ -450,9 +470,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['fred']]
                 The provider to use for the query, by default None.
@@ -464,7 +484,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDESTR], Tag(tag='fred')]]
+                results : List[ESTR]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -485,14 +505,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.estr()
+            >>> obb.fixedincome.rate.estr(parameter="number_of_active_banks")
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/estr",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/estr",
+                        ("fred",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -529,9 +553,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['fred']]
                 The provider to use for the query, by default None.
@@ -541,7 +565,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDIORB], Tag(tag='fred')]]
+                results : List[IORB]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -569,7 +593,11 @@ class ROUTER_fixedincome_rate(Container):
             "/fixedincome/rate/iorb",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/iorb",
+                        ("fred",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -606,9 +634,9 @@ class ROUTER_fixedincome_rate(Container):
 
             Parameters
             ----------
-            start_date : Optional[datetime.date]
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['fred']]
                 The provider to use for the query, by default None.
@@ -620,7 +648,7 @@ class ROUTER_fixedincome_rate(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FREDSONIA], Tag(tag='fred')]]
+                results : List[SONIA]
                     Serializable results.
                 provider : Optional[Literal['fred']]
                     Provider name.
@@ -641,14 +669,18 @@ class ROUTER_fixedincome_rate(Container):
             Example
             -------
             >>> from openbb import obb
-            >>> obb.fixedincome.rate.sonia()
+            >>> obb.fixedincome.rate.sonia(parameter="total_nominal_value")
         """  # noqa: E501
 
         return self._run(
             "/fixedincome/rate/sonia",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/fixedincome/rate/sonia",
+                        ("fred",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,

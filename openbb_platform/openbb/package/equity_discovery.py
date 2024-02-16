@@ -52,7 +52,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFActive], Tag(tag='yfinance')]]
+            results : List[EquityActive]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -94,7 +94,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/active",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/active",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,
@@ -129,7 +133,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFAggressiveSmallCaps], Tag(tag='yfinance')]]
+            results : List[EquityAggressiveSmallCaps]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -171,7 +175,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/aggressive_small_caps",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/aggressive_small_caps",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,
@@ -212,9 +220,9 @@ class ROUTER_equity_discovery(Container):
 
         Parameters
         ----------
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         form_type : Optional[str]
             Filter by form type. Visit https://www.sec.gov/forms for a list of supported form types.
@@ -230,7 +238,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPDiscoveryFilings], Tag(tag='fmp')]]
+            results : List[DiscoveryFilings]
                 Serializable results.
             provider : Optional[Literal['fmp']]
                 Provider name.
@@ -266,7 +274,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/filings",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/filings",
+                        ("fmp",),
+                    )
                 },
                 standard_params={
                     "start_date": start_date,
@@ -304,7 +316,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFGainers], Tag(tag='yfinance')]]
+            results : List[EquityGainers]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -346,7 +358,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/gainers",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/gainers",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,
@@ -381,7 +397,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFGrowthTechEquities], Tag(tag='yfinance')]]
+            results : List[GrowthTechEquities]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -423,7 +439,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/growth_tech",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/growth_tech",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,
@@ -458,7 +478,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFLosers], Tag(tag='yfinance')]]
+            results : List[EquityLosers]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -500,7 +520,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/losers",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/losers",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,
@@ -535,7 +559,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFUndervaluedGrowthEquities], Tag(tag='yfinance')]]
+            results : List[EquityUndervaluedGrowth]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -577,7 +601,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/undervalued_growth",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/undervalued_growth",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,
@@ -612,7 +640,7 @@ class ROUTER_equity_discovery(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[YFUndervaluedLargeCaps], Tag(tag='yfinance')]]
+            results : List[EquityUndervaluedLargeCaps]
                 Serializable results.
             provider : Optional[Literal['yfinance']]
                 Provider name.
@@ -654,7 +682,11 @@ class ROUTER_equity_discovery(Container):
             "/equity/discovery/undervalued_large_caps",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/discovery/undervalued_large_caps",
+                        ("yfinance",),
+                    )
                 },
                 standard_params={
                     "sort": sort,

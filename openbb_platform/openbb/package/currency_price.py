@@ -25,7 +25,7 @@ class ROUTER_currency_price(Container):
         symbol: Annotated[
             Union[str, List[str]],
             OpenBBCustomParameter(
-                description="Symbol to get data for. Can use CURR1-CURR2 or CURR1CURR2 format."
+                description="Symbol to get data for. Can use CURR1-CURR2 or CURR1CURR2 format. Multiple items allowed: polygon, yfinance."
             ),
         ],
         start_date: Annotated[
@@ -55,11 +55,11 @@ class ROUTER_currency_price(Container):
 
             Parameters
             ----------
-            symbol : str
-                Symbol to get data for. Can use CURR1-CURR2 or CURR1CURR2 format.
-            start_date : Optional[datetime.date]
+            symbol : Union[str, List[str]]
+                Symbol to get data for. Can use CURR1-CURR2 or CURR1CURR2 format. Multiple items allowed: polygon, yfinance.
+            start_date : Union[datetime.date, None, str]
                 Start date of the data, in YYYY-MM-DD format.
-            end_date : Optional[datetime.date]
+            end_date : Union[datetime.date, None, str]
                 End date of the data, in YYYY-MM-DD format.
             provider : Optional[Literal['fmp', 'polygon', 'tiingo', 'yfinance']]
                 The provider to use for the query, by default None.
@@ -77,7 +77,7 @@ class ROUTER_currency_price(Container):
             Returns
             -------
             OBBject
-                results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPCurrencyHistorical], Tag(tag='fmp')], Annotated[List[PolygonCurrencyHistorical], Tag(tag='polygon')], Annotated[List[TiingoCurrencyHistorical], Tag(tag='tiingo')], Annotated[List[YFinanceCurrencyHistorical], Tag(tag='yfinance')]]
+                results : List[CurrencyHistorical]
                     Serializable results.
                 provider : Optional[Literal['fmp', 'polygon', 'tiingo', 'yfinance']]
                     Provider name.
@@ -133,13 +133,20 @@ class ROUTER_currency_price(Container):
             "/currency/price/historical",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/currency/price/historical",
+                        ("fmp", "polygon", "tiingo", "yfinance"),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                     "start_date": start_date,
                     "end_date": end_date,
                 },
                 extra_params=kwargs,
+                extra_info={
+                    "symbol": {"multiple_items_allowed": ["polygon", "yfinance"]}
+                },
             )
         )

@@ -57,9 +57,9 @@ class ROUTER_economy_gdp(Container):
         ----------
         period : Literal['quarter', 'annual']
             Time period of the data to return. Units for nominal GDP period. Either quarter or annual.
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         type : Literal['nominal', 'real']
             Type of GDP to get forecast of. Either nominal or real.
@@ -73,7 +73,7 @@ class ROUTER_economy_gdp(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[OECDGdpForecast], Tag(tag='oecd')]]
+            results : List[GdpForecast]
                 Serializable results.
             provider : Optional[Literal['oecd']]
                 Provider name.
@@ -101,7 +101,11 @@ class ROUTER_economy_gdp(Container):
             "/economy/gdp/forecast",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/economy/gdp/forecast",
+                        ("oecd",),
+                    )
                 },
                 standard_params={
                     "period": period,
@@ -143,9 +147,9 @@ class ROUTER_economy_gdp(Container):
         ----------
         units : Literal['usd', 'usd_cap']
             The unit of measurement for the data. Units to get nominal GDP in. Either usd or usd_cap indicating per capita.
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         provider : Optional[Literal['oecd']]
             The provider to use for the query, by default None.
@@ -157,7 +161,7 @@ class ROUTER_economy_gdp(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[OECDGdpNominal], Tag(tag='oecd')]]
+            results : List[GdpNominal]
                 Serializable results.
             provider : Optional[Literal['oecd']]
                 Provider name.
@@ -185,7 +189,11 @@ class ROUTER_economy_gdp(Container):
             "/economy/gdp/nominal",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/economy/gdp/nominal",
+                        ("oecd",),
+                    )
                 },
                 standard_params={
                     "units": units,
@@ -226,9 +234,9 @@ class ROUTER_economy_gdp(Container):
         ----------
         units : Literal['idx', 'qoq', 'yoy']
             The unit of measurement for the data. Either idx (indicating 2015=100), qoq (previous period) or yoy (same period, previous year).)
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         provider : Optional[Literal['oecd']]
             The provider to use for the query, by default None.
@@ -240,7 +248,7 @@ class ROUTER_economy_gdp(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[OECDGdpReal], Tag(tag='oecd')]]
+            results : List[GdpReal]
                 Serializable results.
             provider : Optional[Literal['oecd']]
                 Provider name.
@@ -268,7 +276,11 @@ class ROUTER_economy_gdp(Container):
             "/economy/gdp/real",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/economy/gdp/real",
+                        ("oecd",),
+                    )
                 },
                 standard_params={
                     "units": units,

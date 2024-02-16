@@ -24,7 +24,7 @@ class BenzingaCompanyNewsQueryParams(CompanyNewsQueryParams):
     """
 
     __alias_dict__ = {
-        "symbols": "tickers",
+        "symbol": "tickers",
         "display": "displayOutput",
         "limit": "pageSize",
         "start_date": "dateFrom",
@@ -32,6 +32,8 @@ class BenzingaCompanyNewsQueryParams(CompanyNewsQueryParams):
         "updated_since": "updatedSince",
         "published_since": "publishedSince",
     }
+    __json_schema_extra__ = {"symbol": ["multiple_items_allowed"]}
+
     date: Optional[dateType] = Field(
         default=None, description=QUERY_DESCRIPTIONS.get("date", "")
     )

@@ -27,7 +27,9 @@ class ROUTER_equity_price(Container):
         self,
         symbol: Annotated[
             Union[str, List[str]],
-            OpenBBCustomParameter(description="Symbol to get data for."),
+            OpenBBCustomParameter(
+                description="Symbol to get data for. Multiple items allowed: fmp, polygon, tiingo, yfinance."
+            ),
         ],
         interval: Annotated[
             Optional[str],
@@ -54,13 +56,13 @@ class ROUTER_equity_price(Container):
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for.
+        symbol : Union[str, List[str]]
+            Symbol to get data for. Multiple items allowed: fmp, polygon, tiingo, yfinance.
         interval : Optional[str]
             Time interval of the data to return.
-        start_date : Optional[datetime.date]
+        start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
-        end_date : Optional[datetime.date]
+        end_date : Union[datetime.date, None, str]
             End date of the data, in YYYY-MM-DD format.
         provider : Optional[Literal['fmp', 'intrinio', 'polygon', 'tiingo', 'yfinanc...
             The provider to use for the query, by default None.
@@ -92,7 +94,7 @@ class ROUTER_equity_price(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPEquityHistorical], Tag(tag='fmp')], Annotated[List[IntrinioEquityHistorical], Tag(tag='intrinio')], Annotated[List[PolygonEquityHistorical], Tag(tag='polygon')], Annotated[List[TiingoEquityHistorical], Tag(tag='tiingo')], Annotated[List[YFinanceEquityHistorical], Tag(tag='yfinance')]]
+            results : List[EquityHistorical]
                 Serializable results.
             provider : Optional[Literal['fmp', 'intrinio', 'polygon', 'tiingo', 'yfinance']]
                 Provider name.
@@ -174,15 +176,29 @@ class ROUTER_equity_price(Container):
             "/equity/price/historical",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/price/historical",
+                        ("fmp", "intrinio", "polygon", "tiingo", "yfinance"),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                     "interval": interval,
                     "start_date": start_date,
                     "end_date": end_date,
                 },
                 extra_params=kwargs,
+                extra_info={
+                    "symbol": {
+                        "multiple_items_allowed": [
+                            "fmp",
+                            "polygon",
+                            "tiingo",
+                            "yfinance",
+                        ]
+                    }
+                },
             )
         )
 
@@ -190,8 +206,7 @@ class ROUTER_equity_price(Container):
     def nbbo(
         self,
         symbol: Annotated[
-            Union[str, List[str]],
-            OpenBBCustomParameter(description="Symbol to get data for."),
+            str, OpenBBCustomParameter(description="Symbol to get data for.")
         ],
         provider: Optional[Literal["polygon"]] = None,
         **kwargs
@@ -236,7 +251,7 @@ class ROUTER_equity_price(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[PolygonEquityNBBO], Tag(tag='polygon')]]
+            results : List[EquityNBBO]
                 Serializable results.
             provider : Optional[Literal['polygon']]
                 Provider name.
@@ -303,10 +318,14 @@ class ROUTER_equity_price(Container):
             "/equity/price/nbbo",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/price/nbbo",
+                        ("polygon",),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                 },
                 extra_params=kwargs,
             )
@@ -316,8 +335,7 @@ class ROUTER_equity_price(Container):
     def performance(
         self,
         symbol: Annotated[
-            Union[str, List[str]],
-            OpenBBCustomParameter(description="Symbol to get data for."),
+            str, OpenBBCustomParameter(description="Symbol to get data for.")
         ],
         provider: Optional[Literal["fmp"]] = None,
         **kwargs
@@ -336,7 +354,7 @@ class ROUTER_equity_price(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPPricePerformance], Tag(tag='fmp')]]
+            results : List[PricePerformance]
                 Serializable results.
             provider : Optional[Literal['fmp']]
                 Provider name.
@@ -390,10 +408,14 @@ class ROUTER_equity_price(Container):
             "/equity/price/performance",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/price/performance",
+                        ("fmp",),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                 },
                 extra_params=kwargs,
             )
@@ -405,7 +427,7 @@ class ROUTER_equity_price(Container):
         symbol: Annotated[
             Union[str, List[str]],
             OpenBBCustomParameter(
-                description="Symbol to get data for. This endpoint will accept multiple symbols separated by commas."
+                description="Symbol to get data for. This endpoint will accept multiple symbols separated by commas. Multiple items allowed: fmp, intrinio, yfinance."
             ),
         ],
         provider: Optional[Literal["fmp", "intrinio", "yfinance"]] = None,
@@ -415,8 +437,8 @@ class ROUTER_equity_price(Container):
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for. This endpoint will accept multiple symbols separated by commas.
+        symbol : Union[str, List[str]]
+            Symbol to get data for. This endpoint will accept multiple symbols separated by commas. Multiple items allowed: fmp, intrinio, yfinance.
         provider : Optional[Literal['fmp', 'intrinio', 'yfinance']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -427,7 +449,7 @@ class ROUTER_equity_price(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPEquityQuote], Tag(tag='fmp')], Annotated[List[IntrinioEquityQuote], Tag(tag='intrinio')], Annotated[List[YFinanceEquityQuote], Tag(tag='yfinance')]]
+            results : List[EquityQuote]
                 Serializable results.
             provider : Optional[Literal['fmp', 'intrinio', 'yfinance']]
                 Provider name.
@@ -551,11 +573,20 @@ class ROUTER_equity_price(Container):
             "/equity/price/quote",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/price/quote",
+                        ("fmp", "intrinio", "yfinance"),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                 },
                 extra_params=kwargs,
+                extra_info={
+                    "symbol": {
+                        "multiple_items_allowed": ["fmp", "intrinio", "yfinance"]
+                    }
+                },
             )
         )

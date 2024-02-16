@@ -24,6 +24,7 @@ class BenzingaPriceTargetQueryParams(PriceTargetQueryParams):
         "limit": "pageSize",
         "symbol": "parameters[tickers]",
     }
+    __json_schema_extra__ = {"symbol": ["multiple_items_allowed"]}
 
     fields: Optional[str] = Field(
         default=None,
@@ -110,7 +111,6 @@ class BenzingaPriceTargetData(PriceTargetData):
         "published_date": "date",
         "news_url": "url_news",
         "adj_price_target": "adjusted_pt_current",
-        "analyst_name": "analyst",
         "price_target": "pt_current",
     }
 

@@ -28,17 +28,19 @@ class ROUTER_regulators_sec(Container):
         self,
         symbol: Annotated[
             Union[str, List[str]],
-            OpenBBCustomParameter(description="Symbol to get data for."),
+            OpenBBCustomParameter(
+                description="Symbol to get data for. Multiple items allowed: intrinio, yfinance."
+            ),
         ],
         provider: Optional[Literal["sec"]] = None,
         **kwargs
     ) -> OBBject:
-        """Get the CIK number corresponding to a ticker symbol.
+        """Map a ticker symbol to a CIK number.
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for.
+        symbol : Union[str, List[str]]
+            Symbol to get data for. Multiple items allowed: intrinio, yfinance.
         provider : Optional[Literal['sec']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'sec' if there is
@@ -47,7 +49,7 @@ class ROUTER_regulators_sec(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[SecCikMap, Tag(tag='sec')]]
+            results : CikMap
                 Serializable results.
             provider : Optional[Literal['sec']]
                 Provider name.
@@ -66,19 +68,27 @@ class ROUTER_regulators_sec(Container):
         Example
         -------
         >>> from openbb import obb
-        >>> obb.regulators.sec.cik_map(symbol="AAPL")
+        >>> obb.regulators.sec.cik_map(symbol="MSFT").results.cik
+        >>>     0000789019
         """  # noqa: E501
 
         return self._run(
             "/regulators/sec/cik_map",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/regulators/sec/cik_map",
+                        ("sec",),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                 },
                 extra_params=kwargs,
+                extra_info={
+                    "symbol": {"multiple_items_allowed": ["intrinio", "yfinance"]}
+                },
             )
         )
 
@@ -95,7 +105,7 @@ class ROUTER_regulators_sec(Container):
         provider: Optional[Literal["sec"]] = None,
         **kwargs
     ) -> OBBject:
-        """Look up institutions regulated by the SEC.
+        """Search SEC-regulated institutions by name and return a list of results with CIK numbers.
 
         Parameters
         ----------
@@ -111,7 +121,7 @@ class ROUTER_regulators_sec(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[SecInstitutionsSearch], Tag(tag='sec')]]
+            results : List[InstitutionsSearch]
                 Serializable results.
             provider : Optional[Literal['sec']]
                 Provider name.
@@ -132,14 +142,18 @@ class ROUTER_regulators_sec(Container):
         Example
         -------
         >>> from openbb import obb
-        >>> obb.regulators.sec.institutions_search(query="AAPL", use_cache=True)
+        >>> obb.regulators.sec.institutions_search(query="blackstone real estate").to_df()
         """  # noqa: E501
 
         return self._run(
             "/regulators/sec/institutions_search",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/regulators/sec/institutions_search",
+                        ("sec",),
+                    )
                 },
                 standard_params={
                     "query": query,
@@ -165,7 +179,7 @@ class ROUTER_regulators_sec(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[SecRssLitigation], Tag(tag='sec')]]
+            results : List[RssLitigation]
                 Serializable results.
             provider : Optional[Literal['sec']]
                 Provider name.
@@ -192,14 +206,18 @@ class ROUTER_regulators_sec(Container):
         Example
         -------
         >>> from openbb import obb
-        >>> obb.regulators.sec.rss_litigation()
+        >>> obb.regulators.sec.rss_litigation().to_dict("records")[0]
         """  # noqa: E501
 
         return self._run(
             "/regulators/sec/rss_litigation",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/regulators/sec/rss_litigation",
+                        ("sec",),
+                    )
                 },
                 standard_params={},
                 extra_params=kwargs,
@@ -219,7 +237,7 @@ class ROUTER_regulators_sec(Container):
         provider: Optional[Literal["sec"]] = None,
         **kwargs
     ) -> OBBject:
-        """Get lists of SEC XML schema files by year.
+        """A tool for navigating the directory of SEC XML schema files by year.
 
         Parameters
         ----------
@@ -237,7 +255,7 @@ class ROUTER_regulators_sec(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[SecSchemaFiles, Tag(tag='sec')]]
+            results : SchemaFiles
                 Serializable results.
             provider : Optional[Literal['sec']]
                 Provider name.
@@ -256,14 +274,34 @@ class ROUTER_regulators_sec(Container):
         Example
         -------
         >>> from openbb import obb
-        >>> obb.regulators.sec.schema_files(query="AAPL", use_cache=True)
+        >>> data = obb.regulators.sec.schema_files()
+        >>> data.files[0]
+        >>>     https://xbrl.fasb.org/us-gaap/
+        >>> #### The directory structure can be navigated by constructing a URL from the 'results' list. ####
+        >>> url = data.files[0]+data.files[-1]
+        >>> #### The URL base will always be the 0 position in the list, feed  the URL back in as a parameter. ####
+        >>> obb.regulators.sec.schema_files(url=url).results.files
+        >>>     ['https://xbrl.fasb.org/us-gaap/2024/'
+        >>>     'USGAAP2024FileList.xml'
+        >>>     'dis/'
+        >>>     'dqcrules/'
+        >>>     'ebp/'
+        >>>     'elts/'
+        >>>     'entire/'
+        >>>     'meta/'
+        >>>     'stm/'
+        >>>     'us-gaap-2024.zip']
         """  # noqa: E501
 
         return self._run(
             "/regulators/sec/schema_files",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/regulators/sec/schema_files",
+                        ("sec",),
+                    )
                 },
                 standard_params={
                     "query": query,
@@ -286,7 +324,7 @@ class ROUTER_regulators_sec(Container):
         provider: Optional[Literal["sec"]] = None,
         **kwargs
     ) -> OBBject:
-        """Search for Industry Titles, Reporting Office, and SIC Codes.
+        """Search for Industry Titles, Reporting Office, and SIC Codes. An empty query string returns all results.
 
         Parameters
         ----------
@@ -302,7 +340,7 @@ class ROUTER_regulators_sec(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[SecSicSearch], Tag(tag='sec')]]
+            results : List[SicSearch]
                 Serializable results.
             provider : Optional[Literal['sec']]
                 Provider name.
@@ -325,14 +363,18 @@ class ROUTER_regulators_sec(Container):
         Example
         -------
         >>> from openbb import obb
-        >>> obb.regulators.sec.sic_search(query="AAPL", use_cache=True)
+        >>> obb.regulators.sec.sic_search("real estate investment trusts").results
         """  # noqa: E501
 
         return self._run(
             "/regulators/sec/sic_search",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/regulators/sec/sic_search",
+                        ("sec",),
+                    )
                 },
                 standard_params={
                     "query": query,
@@ -355,7 +397,7 @@ class ROUTER_regulators_sec(Container):
         provider: Optional[Literal["sec"]] = None,
         **kwargs
     ) -> OBBject:
-        """Get the ticker symbol corresponding to a company's CIK.
+        """Map a CIK number to a ticker symbol, leading 0s can be omitted or included.
 
         Parameters
         ----------
@@ -371,7 +413,7 @@ class ROUTER_regulators_sec(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[SecSymbolMap, Tag(tag='sec')]]
+            results : SymbolMap
                 Serializable results.
             provider : Optional[Literal['sec']]
                 Provider name.
@@ -390,14 +432,19 @@ class ROUTER_regulators_sec(Container):
         Example
         -------
         >>> from openbb import obb
-        >>> obb.regulators.sec.symbol_map(query="AAPL", use_cache=True)
+        >>> obb.regulators.sec.symbol_map("0000789019").results.symbol
+        >>>     MSFT
         """  # noqa: E501
 
         return self._run(
             "/regulators/sec/symbol_map",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/regulators/sec/symbol_map",
+                        ("sec",),
+                    )
                 },
                 standard_params={
                     "query": query,

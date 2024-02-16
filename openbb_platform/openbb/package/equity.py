@@ -90,7 +90,7 @@ class ROUTER_equity(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPMarketSnapshots], Tag(tag='fmp')], Annotated[List[PolygonMarketSnapshots], Tag(tag='polygon')]]
+            results : List[MarketSnapshots]
                 Serializable results.
             provider : Optional[Literal['fmp', 'polygon']]
                 Provider name.
@@ -194,7 +194,11 @@ class ROUTER_equity(Container):
             "/equity/market_snapshots",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/market_snapshots",
+                        ("fmp", "polygon"),
+                    )
                 },
                 standard_params={},
                 extra_params=kwargs,
@@ -222,7 +226,9 @@ class ROUTER_equity(Container):
         self,
         symbol: Annotated[
             Union[str, List[str]],
-            OpenBBCustomParameter(description="Symbol to get data for."),
+            OpenBBCustomParameter(
+                description="Symbol to get data for. Multiple items allowed: intrinio, yfinance."
+            ),
         ],
         provider: Optional[Literal["fmp", "intrinio", "yfinance"]] = None,
         **kwargs
@@ -231,8 +237,8 @@ class ROUTER_equity(Container):
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for.
+        symbol : Union[str, List[str]]
+            Symbol to get data for. Multiple items allowed: intrinio, yfinance.
         provider : Optional[Literal['fmp', 'intrinio', 'yfinance']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -241,7 +247,7 @@ class ROUTER_equity(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPEquityProfile], Tag(tag='fmp')], Annotated[List[IntrinioEquityInfo], Tag(tag='intrinio')], Annotated[List[YFinanceEquityProfile], Tag(tag='yfinance')]]
+            results : List[EquityInfo]
                 Serializable results.
             provider : Optional[Literal['fmp', 'intrinio', 'yfinance']]
                 Provider name.
@@ -386,12 +392,19 @@ class ROUTER_equity(Container):
             "/equity/profile",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/profile",
+                        ("fmp", "intrinio", "yfinance"),
+                    )
                 },
                 standard_params={
-                    "symbol": ",".join(symbol) if isinstance(symbol, list) else symbol,
+                    "symbol": symbol,
                 },
                 extra_params=kwargs,
+                extra_info={
+                    "symbol": {"multiple_items_allowed": ["intrinio", "yfinance"]}
+                },
             )
         )
 
@@ -443,7 +456,7 @@ class ROUTER_equity(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[FMPEquityScreener], Tag(tag='fmp')]]
+            results : List[EquityScreener]
                 Serializable results.
             provider : Optional[Literal['fmp']]
                 Provider name.
@@ -495,7 +508,11 @@ class ROUTER_equity(Container):
             "/equity/screener",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/screener",
+                        ("fmp",),
+                    )
                 },
                 standard_params={},
                 extra_params=kwargs,
@@ -541,7 +558,7 @@ class ROUTER_equity(Container):
         Returns
         -------
         OBBject
-            results : Union[Annotated[Union[list, dict], Tag(tag='openbb')], Annotated[List[IntrinioEquitySearch], Tag(tag='intrinio')], Annotated[List[SecEquitySearch], Tag(tag='sec')]]
+            results : List[EquitySearch]
                 Serializable results.
             provider : Optional[Literal['intrinio', 'sec']]
                 Provider name.
@@ -576,7 +593,11 @@ class ROUTER_equity(Container):
             "/equity/search",
             **filter_inputs(
                 provider_choices={
-                    "provider": provider,
+                    "provider": self._get_provider(
+                        provider,
+                        "/equity/search",
+                        ("intrinio", "sec"),
+                    )
                 },
                 standard_params={
                     "query": query,
