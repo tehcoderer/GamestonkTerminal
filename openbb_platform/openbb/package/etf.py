@@ -6,7 +6,7 @@ from typing import List, Literal, Optional, Union
 from openbb_core.app.model.custom_parameter import OpenBBCustomParameter
 from openbb_core.app.model.obbject import OBBject
 from openbb_core.app.static.container import Container
-from openbb_core.app.static.utils.decorators import validate
+from openbb_core.app.static.utils.decorators import exception_handler, validate
 from openbb_core.app.static.utils.filters import filter_inputs
 from typing_extensions import Annotated
 
@@ -28,11 +28,15 @@ class ROUTER_etf(Container):
     def __repr__(self) -> str:
         return self.__doc__ or ""
 
+    @exception_handler
     @validate
     def countries(
         self,
         symbol: Annotated[
-            str, OpenBBCustomParameter(description="Symbol to get data for. (ETF)")
+            Union[str, List[str]],
+            OpenBBCustomParameter(
+                description="Symbol to get data for. (ETF) Multiple items allowed for provider(s): fmp."
+            ),
         ],
         provider: Optional[Literal["fmp"]] = None,
         **kwargs
@@ -41,8 +45,8 @@ class ROUTER_etf(Container):
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for. (ETF)
+        symbol : Union[str, List[str]]
+            Symbol to get data for. (ETF) Multiple items allowed for provider(s): fmp.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -87,16 +91,18 @@ class ROUTER_etf(Container):
                     "symbol": symbol,
                 },
                 extra_params=kwargs,
+                extra_info={"symbol": {"multiple_items_allowed": ["fmp"]}},
             )
         )
 
+    @exception_handler
     @validate
     def equity_exposure(
         self,
         symbol: Annotated[
             Union[str, List[str]],
             OpenBBCustomParameter(
-                description="Symbol to get data for. (Stock) Multiple items allowed: fmp."
+                description="Symbol to get data for. (Stock) Multiple items allowed for provider(s): fmp."
             ),
         ],
         provider: Optional[Literal["fmp"]] = None,
@@ -107,7 +113,7 @@ class ROUTER_etf(Container):
         Parameters
         ----------
         symbol : Union[str, List[str]]
-            Symbol to get data for. (Stock) Multiple items allowed: fmp.
+            Symbol to get data for. (Stock) Multiple items allowed for provider(s): fmp.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -166,6 +172,7 @@ class ROUTER_etf(Container):
             )
         )
 
+    @exception_handler
     @validate
     def historical(
         self,
@@ -218,7 +225,7 @@ class ROUTER_etf(Container):
 
         EtfHistorical
         -------------
-        date : date
+        date : Union[date, datetime]
             The date of the data.
         open : float
             The open price.
@@ -237,6 +244,9 @@ class ROUTER_etf(Container):
         -------
         >>> from openbb import obb
         >>> obb.etf.historical(symbol="SPY")
+        >>> obb.etf.historical("SPY", provider="yfinance")
+        >>> #### This function accepts multiple tickers. ####
+        >>> obb.etf.historical("SPY,IWM,QQQ,DJIA", provider="yfinance")
         """  # noqa: E501
 
         return self._run(
@@ -258,6 +268,7 @@ class ROUTER_etf(Container):
             )
         )
 
+    @exception_handler
     @validate
     def holdings(
         self,
@@ -404,11 +415,11 @@ class ROUTER_etf(Container):
             The floating rate spread for reveivable portion of the swap. (provider: sec)
         rate_tenor_rec : Optional[str]
             The rate tenor for reveivable portion of the swap. (provider: sec)
-        rate_tenor_unit_rec : Optional[Union[str, int]]
+        rate_tenor_unit_rec : Optional[Union[int, str]]
             The rate tenor unit for reveivable portion of the swap. (provider: sec)
         reset_date_rec : Optional[str]
             The reset date for reveivable portion of the swap. (provider: sec)
-        reset_date_unit_rec : Optional[Union[str, int]]
+        reset_date_unit_rec : Optional[Union[int, str]]
             The reset date unit for reveivable portion of the swap. (provider: sec)
         rate_type_pmnt : Optional[str]
             The type of rate for payment portion of the swap. (provider: sec)
@@ -422,11 +433,11 @@ class ROUTER_etf(Container):
             The floating rate spread for payment portion of the swap. (provider: sec)
         rate_tenor_pmnt : Optional[str]
             The rate tenor for payment portion of the swap. (provider: sec)
-        rate_tenor_unit_pmnt : Optional[Union[str, int]]
+        rate_tenor_unit_pmnt : Optional[Union[int, str]]
             The rate tenor unit for payment portion of the swap. (provider: sec)
         reset_date_pmnt : Optional[str]
             The reset date for payment portion of the swap. (provider: sec)
-        reset_date_unit_pmnt : Optional[Union[str, int]]
+        reset_date_unit_pmnt : Optional[Union[int, str]]
             The reset date unit for payment portion of the swap. (provider: sec)
         repo_type : Optional[str]
             The type of repo. (provider: sec)
@@ -490,6 +501,7 @@ class ROUTER_etf(Container):
             )
         )
 
+    @exception_handler
     @validate
     def holdings_date(
         self,
@@ -554,11 +566,15 @@ class ROUTER_etf(Container):
             )
         )
 
+    @exception_handler
     @validate
     def holdings_performance(
         self,
         symbol: Annotated[
-            str, OpenBBCustomParameter(description="Symbol to get data for.")
+            Union[str, List[str]],
+            OpenBBCustomParameter(
+                description="Symbol to get data for. Multiple items allowed for provider(s): fmp."
+            ),
         ],
         provider: Optional[Literal["fmp"]] = None,
         **kwargs
@@ -567,8 +583,8 @@ class ROUTER_etf(Container):
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for.
+        symbol : Union[str, List[str]]
+            Symbol to get data for. Multiple items allowed for provider(s): fmp.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -641,16 +657,18 @@ class ROUTER_etf(Container):
                     "symbol": symbol,
                 },
                 extra_params=kwargs,
+                extra_info={"symbol": {"multiple_items_allowed": ["fmp"]}},
             )
         )
 
+    @exception_handler
     @validate
     def info(
         self,
         symbol: Annotated[
             Union[str, List[str]],
             OpenBBCustomParameter(
-                description="Symbol to get data for. (ETF) Multiple items allowed: fmp, yfinance."
+                description="Symbol to get data for. (ETF) Multiple items allowed for provider(s): fmp, yfinance."
             ),
         ],
         provider: Optional[Literal["fmp", "yfinance"]] = None,
@@ -661,7 +679,7 @@ class ROUTER_etf(Container):
         Parameters
         ----------
         symbol : Union[str, List[str]]
-            Symbol to get data for. (ETF) Multiple items allowed: fmp, yfinance.
+            Symbol to get data for. (ETF) Multiple items allowed for provider(s): fmp, yfinance.
         provider : Optional[Literal['fmp', 'yfinance']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -804,11 +822,15 @@ class ROUTER_etf(Container):
             )
         )
 
+    @exception_handler
     @validate
     def price_performance(
         self,
         symbol: Annotated[
-            str, OpenBBCustomParameter(description="Symbol to get data for.")
+            Union[str, List[str]],
+            OpenBBCustomParameter(
+                description="Symbol to get data for. Multiple items allowed for provider(s): fmp."
+            ),
         ],
         provider: Optional[Literal["fmp"]] = None,
         **kwargs
@@ -817,8 +839,8 @@ class ROUTER_etf(Container):
 
         Parameters
         ----------
-        symbol : str
-            Symbol to get data for.
+        symbol : Union[str, List[str]]
+            Symbol to get data for. Multiple items allowed for provider(s): fmp.
         provider : Optional[Literal['fmp']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'fmp' if there is
@@ -891,9 +913,11 @@ class ROUTER_etf(Container):
                     "symbol": symbol,
                 },
                 extra_params=kwargs,
+                extra_info={"symbol": {"multiple_items_allowed": ["fmp"]}},
             )
         )
 
+    @exception_handler
     @validate
     def search(
         self,
@@ -908,68 +932,68 @@ class ROUTER_etf(Container):
         An empty query returns the full list of ETFs from the provider.
 
 
-            Parameters
-            ----------
-            query : Optional[str]
-                Search query.
+        Parameters
+        ----------
+        query : Optional[str]
+            Search query.
+        provider : Optional[Literal['fmp']]
+            The provider to use for the query, by default None.
+            If None, the provider specified in defaults is selected or 'fmp' if there is
+            no default.
+        exchange : Optional[Literal['AMEX', 'NYSE', 'NASDAQ', 'ETF', 'TSX', 'EURONEXT']]
+            The exchange code the ETF trades on. (provider: fmp)
+        is_active : Optional[Literal[True, False]]
+            Whether the ETF is actively trading. (provider: fmp)
+
+        Returns
+        -------
+        OBBject
+            results : List[EtfSearch]
+                Serializable results.
             provider : Optional[Literal['fmp']]
-                The provider to use for the query, by default None.
-                If None, the provider specified in defaults is selected or 'fmp' if there is
-                no default.
-            exchange : Optional[Literal['AMEX', 'NYSE', 'NASDAQ', 'ETF', 'TSX', 'EURONEXT']]
-                The exchange code the ETF trades on. (provider: fmp)
-            is_active : Optional[Literal[True, False]]
-                Whether the ETF is actively trading. (provider: fmp)
+                Provider name.
+            warnings : Optional[List[Warning_]]
+                List of warnings.
+            chart : Optional[Chart]
+                Chart object.
+            extra: Dict[str, Any]
+                Extra info.
 
-            Returns
-            -------
-            OBBject
-                results : List[EtfSearch]
-                    Serializable results.
-                provider : Optional[Literal['fmp']]
-                    Provider name.
-                warnings : Optional[List[Warning_]]
-                    List of warnings.
-                chart : Optional[Chart]
-                    Chart object.
-                extra: Dict[str, Any]
-                    Extra info.
+        EtfSearch
+        ---------
+        symbol : str
+            Symbol representing the entity requested in the data.(ETF)
+        name : Optional[str]
+            Name of the ETF.
+        market_cap : Optional[float]
+            The market cap of the ETF. (provider: fmp)
+        sector : Optional[str]
+            The sector of the ETF. (provider: fmp)
+        industry : Optional[str]
+            The industry of the ETF. (provider: fmp)
+        beta : Optional[float]
+            The beta of the ETF. (provider: fmp)
+        price : Optional[float]
+            The current price of the ETF. (provider: fmp)
+        last_annual_dividend : Optional[float]
+            The last annual dividend paid. (provider: fmp)
+        volume : Optional[float]
+            The current trading volume of the ETF. (provider: fmp)
+        exchange : Optional[str]
+            The exchange code the ETF trades on. (provider: fmp)
+        exchange_name : Optional[str]
+            The full name of the exchange the ETF trades on. (provider: fmp)
+        country : Optional[str]
+            The country the ETF is registered in. (provider: fmp)
+        actively_trading : Optional[Literal[True, False]]
+            Whether the ETF is actively trading. (provider: fmp)
 
-            EtfSearch
-            ---------
-            symbol : str
-                Symbol representing the entity requested in the data.(ETF)
-            name : Optional[str]
-                Name of the ETF.
-            market_cap : Optional[float]
-                The market cap of the ETF. (provider: fmp)
-            sector : Optional[str]
-                The sector of the ETF. (provider: fmp)
-            industry : Optional[str]
-                The industry of the ETF. (provider: fmp)
-            beta : Optional[float]
-                The beta of the ETF. (provider: fmp)
-            price : Optional[float]
-                The current price of the ETF. (provider: fmp)
-            last_annual_dividend : Optional[float]
-                The last annual dividend paid. (provider: fmp)
-            volume : Optional[float]
-                The current trading volume of the ETF. (provider: fmp)
-            exchange : Optional[str]
-                The exchange code the ETF trades on. (provider: fmp)
-            exchange_name : Optional[str]
-                The full name of the exchange the ETF trades on. (provider: fmp)
-            country : Optional[str]
-                The country the ETF is registered in. (provider: fmp)
-            actively_trading : Optional[Literal[True, False]]
-                Whether the ETF is actively trading. (provider: fmp)
-
-            Example
-            -------
-            >>> from openbb import obb
-            >>> ### An empty query returns the full list of ETFs from the provider. ###
-            >>> obb.etf.search("", provider="fmp")
-            >>> #### The query will return results from text-based fields containing the term. ####obb.etf.search("commercial real estate", provider="fmp")
+        Example
+        -------
+        >>> from openbb import obb
+        >>> ### An empty query returns the full list of ETFs from the provider. ###
+        >>> obb.etf.search("", provider="fmp")
+        >>> #### The query will return results from text-based fields containing the term. ####obb.etf.search("commercial real estate", provider="fmp")
         """  # noqa: E501
 
         return self._run(
@@ -989,6 +1013,7 @@ class ROUTER_etf(Container):
             )
         )
 
+    @exception_handler
     @validate
     def sectors(
         self,

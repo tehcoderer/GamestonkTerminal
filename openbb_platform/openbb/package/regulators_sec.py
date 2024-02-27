@@ -1,11 +1,11 @@
 ### THIS FILE IS AUTO-GENERATED. DO NOT EDIT. ###
 
-from typing import List, Literal, Optional, Union
+from typing import Literal, Optional
 
 from openbb_core.app.model.custom_parameter import OpenBBCustomParameter
 from openbb_core.app.model.obbject import OBBject
 from openbb_core.app.static.container import Container
-from openbb_core.app.static.utils.decorators import validate
+from openbb_core.app.static.utils.decorators import exception_handler, validate
 from openbb_core.app.static.utils.filters import filter_inputs
 from typing_extensions import Annotated
 
@@ -23,14 +23,12 @@ class ROUTER_regulators_sec(Container):
     def __repr__(self) -> str:
         return self.__doc__ or ""
 
+    @exception_handler
     @validate
     def cik_map(
         self,
         symbol: Annotated[
-            Union[str, List[str]],
-            OpenBBCustomParameter(
-                description="Symbol to get data for. Multiple items allowed: intrinio, yfinance."
-            ),
+            str, OpenBBCustomParameter(description="Symbol to get data for.")
         ],
         provider: Optional[Literal["sec"]] = None,
         **kwargs
@@ -39,8 +37,8 @@ class ROUTER_regulators_sec(Container):
 
         Parameters
         ----------
-        symbol : Union[str, List[str]]
-            Symbol to get data for. Multiple items allowed: intrinio, yfinance.
+        symbol : str
+            Symbol to get data for.
         provider : Optional[Literal['sec']]
             The provider to use for the query, by default None.
             If None, the provider specified in defaults is selected or 'sec' if there is
@@ -62,8 +60,8 @@ class ROUTER_regulators_sec(Container):
 
         CikMap
         ------
-        cik : Optional[Union[str, int]]
-            Central Index Key (provider: sec)
+        cik : Optional[Union[int, str]]
+            Central Index Key (CIK) for the requested entity.
 
         Example
         -------
@@ -86,12 +84,10 @@ class ROUTER_regulators_sec(Container):
                     "symbol": symbol,
                 },
                 extra_params=kwargs,
-                extra_info={
-                    "symbol": {"multiple_items_allowed": ["intrinio", "yfinance"]}
-                },
             )
         )
 
+    @exception_handler
     @validate
     def institutions_search(
         self,
@@ -136,7 +132,7 @@ class ROUTER_regulators_sec(Container):
         ------------------
         name : Optional[str]
             The name of the institution. (provider: sec)
-        cik : Optional[Union[str, int]]
+        cik : Optional[Union[int, str]]
             Central Index Key (CIK) (provider: sec)
 
         Example
@@ -163,6 +159,7 @@ class ROUTER_regulators_sec(Container):
             )
         )
 
+    @exception_handler
     @validate
     def rss_litigation(
         self, provider: Optional[Literal["sec"]] = None, **kwargs
@@ -224,6 +221,7 @@ class ROUTER_regulators_sec(Container):
             )
         )
 
+    @exception_handler
     @validate
     def schema_files(
         self,
@@ -311,6 +309,7 @@ class ROUTER_regulators_sec(Container):
             )
         )
 
+    @exception_handler
     @validate
     def sic_search(
         self,
@@ -384,6 +383,7 @@ class ROUTER_regulators_sec(Container):
             )
         )
 
+    @exception_handler
     @validate
     def symbol_map(
         self,
