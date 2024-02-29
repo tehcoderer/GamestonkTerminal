@@ -62,7 +62,11 @@ async def response_callback(
 
     data = await response.json()
     if response.status != 200:
-        message = data.get("message", None) or data.get("error", "unknown error")
+        message = (
+            data.get("message", None)
+            or data.get("Error Message", None)
+            or data.get("error", "unknown error")
+        )
         raise RuntimeError(f"Error in FMP request -> {message}")
 
     if "Error Message" in data:
