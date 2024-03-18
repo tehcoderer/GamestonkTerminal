@@ -48,8 +48,11 @@ class ROUTER_equity_price(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[
-            Literal["fmp", "intrinio", "polygon", "tiingo", "yfinance"]
+        provider: Annotated[
+            Optional[Literal["fmp", "intrinio", "polygon", "tiingo", "yfinance"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
+            ),
         ] = None,
         **kwargs
     ) -> OBBject:
@@ -87,6 +90,10 @@ class ROUTER_equity_price(Container):
             The number of data entries to return. (provider: polygon)
         include_actions : bool
             Include dividends and stock splits in results. (provider: yfinance)
+        adjusted : bool
+            This field is deprecated (4.1.5) and will be removed in a future version. Use 'adjustment' set as 'splits_and_dividends' instead. (provider: yfinance)
+        prepost : bool
+            This field is deprecated (4.1.5) and will be removed in a future version. Use 'extended_hours' as True instead. (provider: yfinance)
 
         Returns
         -------
@@ -157,10 +164,11 @@ class ROUTER_equity_price(Container):
         transactions : Optional[Annotated[int, Gt(gt=0)]]
             Number of transactions for the symbol in the time period. (provider: polygon)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.equity.price.historical(symbol="AAPL", interval="1d")
+        >>> obb.equity.price.historical(symbol='AAPL', provider='fmp')
+        >>> obb.equity.price.historical(symbol='AAPL', interval='1d', provider='intrinio')
         """  # noqa: E501
 
         return self._run(
@@ -200,7 +208,12 @@ class ROUTER_equity_price(Container):
         symbol: Annotated[
             str, OpenBBCustomParameter(description="Symbol to get data for.")
         ],
-        provider: Optional[Literal["polygon"]] = None,
+        provider: Annotated[
+            Optional[Literal["polygon"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'polygon' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Get the National Best Bid and Offer for a given stock.
@@ -218,27 +231,13 @@ class ROUTER_equity_price(Container):
         date : Optional[datetime.date]
             A specific date to get data for. Use bracketed the timestamp parameters to specify exact time ranges. (provider: polygon)
         timestamp_lt : Optional[Union[datetime.datetime, str]]
-
-                    Query by datetime, less than. Either a date with the format YYYY-MM-DD or a TZ-aware timestamp string,
-                    YYYY-MM-DDTH:M:S.000000000-04:00". Include all nanoseconds and the 'T' between the day and hour.
-                 (provider: polygon)
+            Query by datetime, less than. Either a date with the format 'YYYY-MM-DD' or a TZ-aware timestamp string, 'YYYY-MM-DDTH:M:S.000000000-04:00'. Include all nanoseconds and the 'T' between the day and hour. (provider: polygon)
         timestamp_gt : Optional[Union[datetime.datetime, str]]
-
-                    Query by datetime, greater than. Either a date with the format YYYY-MM-DD or a TZ-aware timestamp string,
-                    YYYY-MM-DDTH:M:S.000000000-04:00". Include all nanoseconds and the 'T' between the day and hour.
-                 (provider: polygon)
+            Query by datetime, greater than. Either a date with the format 'YYYY-MM-DD' or a TZ-aware timestamp string, 'YYYY-MM-DDTH:M:S.000000000-04:00'. Include all nanoseconds and the 'T' between the day and hour. (provider: polygon)
         timestamp_lte : Optional[Union[datetime.datetime, str]]
-
-                    Query by datetime, less than or equal to.
-                    Either a date with the format YYYY-MM-DD or a TZ-aware timestamp string,
-                    YYYY-MM-DDTH:M:S.000000000-04:00". Include all nanoseconds and the 'T' between the day and hour.
-                 (provider: polygon)
+            Query by datetime, less than or equal to. Either a date with the format 'YYYY-MM-DD' or a TZ-aware timestamp string, 'YYYY-MM-DDTH:M:S.000000000-04:00'. Include all nanoseconds and the 'T' between the day and hour. (provider: polygon)
         timestamp_gte : Optional[Union[datetime.datetime, str]]
-
-                    Query by datetime, greater than or equal to.
-                    Either a date with the format YYYY-MM-DD or a TZ-aware timestamp string,
-                    YYYY-MM-DDTH:M:S.000000000-04:00". Include all nanoseconds and the 'T' between the day and hour.
-                 (provider: polygon)
+            Query by datetime, greater than or equal to. Either a date with the format 'YYYY-MM-DD' or a TZ-aware timestamp string, 'YYYY-MM-DDTH:M:S.000000000-04:00'. Include all nanoseconds and the 'T' between the day and hour. (provider: polygon)
 
         Returns
         -------
@@ -279,31 +278,18 @@ class ROUTER_equity_price(Container):
         indicators : Optional[List[int]]
             A list of indicator codes. (provider: polygon)
         sequence_num : Optional[int]
-
-                    The sequence number represents the sequence in which message events happened.
-                    These are increasing and unique per ticker symbol, but will not always be sequential
-                    (e.g., 1, 2, 6, 9, 10, 11)
-                 (provider: polygon)
+            The sequence number represents the sequence in which message events happened. These are increasing and unique per ticker symbol, but will not always be sequential (e.g., 1, 2, 6, 9, 10, 11) (provider: polygon)
         participant_timestamp : Optional[datetime]
-
-                    The nanosecond accuracy Participant/Exchange Unix Timestamp.
-                    This is the timestamp of when the quote was actually generated at the exchange.
-                 (provider: polygon)
+            The nanosecond accuracy Participant/Exchange Unix Timestamp. This is the timestamp of when the quote was actually generated at the exchange. (provider: polygon)
         sip_timestamp : Optional[datetime]
-
-                    The nanosecond accuracy SIP Unix Timestamp.
-                    This is the timestamp of when the SIP received this quote from the exchange which produced it.
-                 (provider: polygon)
+            The nanosecond accuracy SIP Unix Timestamp. This is the timestamp of when the SIP received this quote from the exchange which produced it. (provider: polygon)
         trf_timestamp : Optional[datetime]
+            The nanosecond accuracy TRF (Trade Reporting Facility) Unix Timestamp. This is the timestamp of when the trade reporting facility received this quote. (provider: polygon)
 
-                    The nanosecond accuracy TRF (Trade Reporting Facility) Unix Timestamp.
-                    This is the timestamp of when the trade reporting facility received this quote.
-                 (provider: polygon)
-
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.equity.price.nbbo(symbol="AAPL")
+        >>> obb.equity.price.nbbo(symbol='AAPL', provider='polygon')
         """  # noqa: E501
 
         return self._run(
@@ -333,7 +319,12 @@ class ROUTER_equity_price(Container):
                 description="Symbol to get data for. Multiple items allowed for provider(s): fmp."
             ),
         ],
-        provider: Optional[Literal["fmp"]] = None,
+        provider: Annotated[
+            Optional[Literal["fmp"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Get price performance data for a given stock. This includes price changes for different time periods.
@@ -394,10 +385,10 @@ class ROUTER_equity_price(Container):
         symbol : Optional[str]
             The ticker symbol. (provider: fmp)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.equity.price.performance(symbol="AAPL")
+        >>> obb.equity.price.performance(symbol='AAPL', provider='fmp')
         """  # noqa: E501
 
         return self._run(
@@ -428,7 +419,12 @@ class ROUTER_equity_price(Container):
                 description="Symbol to get data for. This endpoint will accept multiple symbols separated by commas. Multiple items allowed for provider(s): fmp, intrinio, yfinance."
             ),
         ],
-        provider: Optional[Literal["fmp", "intrinio", "yfinance"]] = None,
+        provider: Annotated[
+            Optional[Literal["fmp", "intrinio", "yfinance"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Get the latest quote for a given stock. Quote includes price, volume, and other data.
@@ -548,7 +544,7 @@ class ROUTER_equity_price(Container):
             Source of the Intrinio data. (provider: intrinio)
         updated_on : Optional[datetime]
             Date and Time when the data was last updated. (provider: intrinio)
-        security : Optional[openbb_intrinio.utils.references.IntrinioSecurity]
+        security : Optional[IntrinioSecurity]
             Security details related to the quote. (provider: intrinio)
         ma_50d : Optional[float]
             50-day moving average price. (provider: yfinance)
@@ -561,10 +557,10 @@ class ROUTER_equity_price(Container):
         currency : Optional[str]
             Currency of the price. (provider: yfinance)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.equity.price.quote(symbol="AAPL")
+        >>> obb.equity.price.quote(symbol='AAPL', provider='fmp')
         """  # noqa: E501
 
         return self._run(

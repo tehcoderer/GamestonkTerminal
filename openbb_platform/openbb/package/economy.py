@@ -49,7 +49,12 @@ class ROUTER_economy(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[Literal["fmp", "tradingeconomics"]] = None,
+        provider: Annotated[
+            Optional[Literal["fmp", "tradingeconomics"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Get the upcoming, or historical, economic calendar of global events.
@@ -124,12 +129,12 @@ class ROUTER_economy(Container):
         created_at : Optional[datetime]
             Created at timestamp. (provider: fmp)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.calendar(provider="fmp", start_date="2020-03-01", end_date="2020-03-31")
-        >>> #### By default, the calendar will be forward-looking. ####
-        >>> obb.economy.calendar(provider="nasdaq")
+        >>> # By default, the calendar will be forward-looking.
+        >>> obb.economy.calendar(provider='fmp')
+        >>> obb.economy.calendar(provider='fmp', start_date='2020-03-01', end_date='2020-03-31')
         """  # noqa: E501
 
         return self._run(
@@ -166,7 +171,12 @@ class ROUTER_economy(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[Literal["oecd"]] = None,
+        provider: Annotated[
+            Optional[Literal["oecd"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'oecd' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """The composite leading indicator (CLI) is designed to provide early signals of turning points
@@ -210,10 +220,11 @@ class ROUTER_economy(Container):
         country : Optional[str]
             Country for which CLI is given
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.composite_leading_indicator(country="all").to_df()
+        >>> obb.economy.composite_leading_indicator(provider='oecd')
+        >>> obb.economy.composite_leading_indicator(country='all', provider='oecd')
         """  # noqa: E501
 
         return self._run(
@@ -327,7 +338,12 @@ class ROUTER_economy(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[Literal["fred"]] = None,
+        provider: Annotated[
+            Optional[Literal["fred"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fred' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Consumer Price Index (CPI).  Returns either the rescaled index value, or a rate of change (inflation).
@@ -377,12 +393,12 @@ class ROUTER_economy(Container):
         date : date
             The date of the data.
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.cpi(countries=["japan", "china", "turkey"]).to_df()
-        >>> #### Use the `units` parameter to define the reference period for the change in values. ####
-        >>> obb.economy.cpi(countries=["united_states", "united_kingdom"], units="growth_previous").to_df()
+        >>> obb.economy.cpi(country='japan,china,turkey', provider='fred')
+        >>> # Use the `units` parameter to define the reference period for the change in values.
+        >>> obb.economy.cpi(country='united_states,united_kingdom', units='growth_previous', provider='fred')
         """  # noqa: E501
 
         return self._run(
@@ -413,10 +429,7 @@ class ROUTER_economy(Container):
     def fred_regional(
         self,
         symbol: Annotated[
-            Union[str, List[str]],
-            OpenBBCustomParameter(
-                description="Symbol to get data for. Multiple items allowed for provider(s): fred."
-            ),
+            str, OpenBBCustomParameter(description="Symbol to get data for.")
         ],
         start_date: Annotated[
             Union[datetime.date, None, str],
@@ -434,7 +447,12 @@ class ROUTER_economy(Container):
             Optional[int],
             OpenBBCustomParameter(description="The number of data entries to return."),
         ] = 100000,
-        provider: Optional[Literal["fred"]] = None,
+        provider: Annotated[
+            Optional[Literal["fred"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fred' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Query the Geo Fred API for regional economic data by series group.
@@ -443,8 +461,8 @@ class ROUTER_economy(Container):
 
         Parameters
         ----------
-        symbol : Union[str, List[str]]
-            Symbol to get data for. Multiple items allowed for provider(s): fred.
+        symbol : str
+            Symbol to get data for.
         start_date : Union[datetime.date, None, str]
             Start date of the data, in YYYY-MM-DD format.
         end_date : Union[datetime.date, None, str]
@@ -533,13 +551,12 @@ class ROUTER_economy(Container):
         series_id : Optional[str]
             The individual series ID for the region. (provider: fred)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> #### With no date, the most recent report is returned. ####
-        >>> obb.economy.fred_regional("NYICLAIMS")
-        >>> #### With a date, time series data is returned. ####
-        >>> obb.economy.fred_regional("NYICLAIMS", start_date="2021-01-01")
+        >>> obb.economy.fred_regional(symbol='NYICLAIMS', provider='fred')
+        >>> # With a date, time series data is returned.
+        >>> obb.economy.fred_regional(symbol='NYICLAIMS', start_date='2021-01-01', end_date='2021-12-31', limit=10, provider='fred')
         """  # noqa: E501
 
         return self._run(
@@ -559,7 +576,6 @@ class ROUTER_economy(Container):
                     "limit": limit,
                 },
                 extra_params=kwargs,
-                extra_info={"symbol": {"multiple_items_allowed": ["fred"]}},
             )
         )
 
@@ -570,7 +586,12 @@ class ROUTER_economy(Container):
         query: Annotated[
             Optional[str], OpenBBCustomParameter(description="The search word(s).")
         ] = None,
-        provider: Optional[Literal["fred"]] = None,
+        provider: Annotated[
+            Optional[Literal["fred"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fred' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Search for FRED series or economic releases by ID or string.
@@ -662,10 +683,10 @@ class ROUTER_economy(Container):
         series_group : Optional[Union[int, str]]
             The series group ID of the series. This value is used to query for regional data. (provider: fred)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.fred_search()
+        >>> obb.economy.fred_search(provider='fred')
         """  # noqa: E501
 
         return self._run(
@@ -711,7 +732,12 @@ class ROUTER_economy(Container):
             Optional[int],
             OpenBBCustomParameter(description="The number of data entries to return."),
         ] = 100000,
-        provider: Optional[Literal["fred", "intrinio"]] = None,
+        provider: Annotated[
+            Optional[Literal["fred", "intrinio"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fred' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Get data by series ID from FRED.
@@ -796,14 +822,14 @@ class ROUTER_economy(Container):
         value : Optional[float]
             Value of the index. (provider: intrinio)
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.fred_series("NFCI").to_df()
-        >>> #### Multiple series can be passed in as a list. ####
-        >>> obb.economy.fred_series(["NFCI","STLFSI4"]).to_df()
-        >>> #### Use the `transform` parameter to transform the data as change, log, or percent change. ####
-        >>> obb.economy.fred_series("CBBTCUSD", transform="pc1").to_df()
+        >>> obb.economy.fred_series(symbol='NFCI', provider='fred')
+        >>> # Multiple series can be passed in as a list.
+        >>> obb.economy.fred_series(symbol='NFCI,STLFSI4', provider='fred')
+        >>> # Use the `transform` parameter to transform the data as change, log, or percent change.
+        >>> obb.economy.fred_series(symbol='CBBTCUSD', transform='pc1', provider='fred')
         """  # noqa: E501
 
         return self._run(
@@ -850,7 +876,12 @@ class ROUTER_economy(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[Literal["oecd"]] = None,
+        provider: Annotated[
+            Optional[Literal["oecd"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'oecd' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Long-term interest rates refer to government bonds maturing in ten years.
@@ -901,10 +932,11 @@ class ROUTER_economy(Container):
         country : Optional[str]
             Country for which interest rate is given
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.long_term_interest_rate(country="all", frequency="quarterly").to_df()
+        >>> obb.economy.long_term_interest_rate(provider='oecd')
+        >>> obb.economy.long_term_interest_rate(country='all', frequency='quarterly', provider='oecd')
         """  # noqa: E501
 
         return self._run(
@@ -947,7 +979,12 @@ class ROUTER_economy(Container):
                 description="Whether to return seasonally adjusted data."
             ),
         ] = True,
-        provider: Optional[Literal["federal_reserve"]] = None,
+        provider: Annotated[
+            Optional[Literal["federal_reserve"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'federal_reserve' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Money Measures (M1/M2 and components). The Federal Reserve publishes as part of the H.6 Release.
@@ -998,10 +1035,11 @@ class ROUTER_economy(Container):
         small_denomination_time_deposits : Optional[float]
             Value of small denomination time deposits in billions.
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.money_measures(adjusted=False).to_df()
+        >>> obb.economy.money_measures(provider='federal_reserve')
+        >>> obb.economy.money_measures(adjusted=False, provider='federal_reserve')
         """  # noqa: E501
 
         return self._run(
@@ -1026,7 +1064,14 @@ class ROUTER_economy(Container):
     @exception_handler
     @validate
     def risk_premium(
-        self, provider: Optional[Literal["fmp"]] = None, **kwargs
+        self,
+        provider: Annotated[
+            Optional[Literal["fmp"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
+            ),
+        ] = None,
+        **kwargs
     ) -> OBBject:
         """Market Risk Premium by country.
 
@@ -1062,10 +1107,10 @@ class ROUTER_economy(Container):
         country_risk_premium : Optional[Annotated[float, Ge(ge=0)]]
             Country-specific risk premium.
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.risk_premium().to_df()
+        >>> obb.economy.risk_premium(provider='fmp')
         """  # noqa: E501
 
         return self._run(
@@ -1099,7 +1144,12 @@ class ROUTER_economy(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[Literal["oecd"]] = None,
+        provider: Annotated[
+            Optional[Literal["oecd"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'oecd' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Short-term interest rates are the rates at which short-term borrowings are effected between
@@ -1147,10 +1197,11 @@ class ROUTER_economy(Container):
         country : Optional[str]
             Country for which interest rate is given
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.short_term_interest_rate(country="all", frequency="quarterly").to_df()
+        >>> obb.economy.short_term_interest_rate(provider='oecd')
+        >>> obb.economy.short_term_interest_rate(country='all', frequency='quarterly', provider='oecd')
         """  # noqa: E501
 
         return self._run(
@@ -1187,7 +1238,12 @@ class ROUTER_economy(Container):
                 description="End date of the data, in YYYY-MM-DD format."
             ),
         ] = None,
-        provider: Optional[Literal["oecd"]] = None,
+        provider: Annotated[
+            Optional[Literal["oecd"]],
+            OpenBBCustomParameter(
+                description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'oecd' if there is\n    no default."
+            ),
+        ] = None,
         **kwargs
     ) -> OBBject:
         """Global unemployment data.
@@ -1236,14 +1292,13 @@ class ROUTER_economy(Container):
         country : Optional[str]
             Country for which unemployment rate is given
 
-        Example
-        -------
+        Examples
+        --------
         >>> from openbb import obb
-        >>> obb.economy.unemployment(country="all", frequency="quarterly")
-        >>> #### Demographics for the statistics are selected with the `age` and `sex` parameters. ####
-        >>> obb.economy.unemployment(
-        >>> country="all", frequency="quarterly", age="25-54"
-        >>> ).to_df().pivot(columns="country", values="value")
+        >>> obb.economy.unemployment(provider='oecd')
+        >>> obb.economy.unemployment(country='all', frequency='quarterly', provider='oecd')
+        >>> # Demographics for the statistics are selected with the `age` parameter.
+        >>> obb.economy.unemployment(country='all', frequency='quarterly', age='25-54', provider='oecd')
         """  # noqa: E501
 
         return self._run(
