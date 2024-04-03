@@ -343,7 +343,7 @@ class ImportDefinition:
         code += "\nfrom pydantic import BaseModel"
         code += "\nfrom inspect import Parameter"
         code += "\nimport typing"
-        code += "\nfrom typing import List, Dict, Union, Optional, Literal"
+        code += "\nfrom typing import List, Dict, Union, Optional, Literal, Any"
         code += "\nfrom annotated_types import Ge, Le, Gt, Lt"
         code += "\nfrom warnings import warn, simplefilter"
         if sys.version_info < (3, 9):
@@ -528,10 +528,12 @@ class MethodDefinition:
         return getattr(PathHandler.build_route_map()[path], "summary", "")
 
     @staticmethod
-    def reorder_params(params: Dict[str, Parameter]) -> "OrderedDict[str, Parameter]":
-        """Reorder the params."""
+    def reorder_params(
+        params: Dict[str, Parameter], var_kw: Optional[List[str]] = None
+    ) -> "OrderedDict[str, Parameter]":
+        """Reorder the params and make sure VAR_KEYWORD come after 'provider."""
         formatted_keys = list(params.keys())
-        for k in ["provider", "extra_params"]:
+        for k in ["provider"] + (var_kw or []):
             if k in formatted_keys:
                 formatted_keys.remove(k)
                 formatted_keys.append(k)
@@ -563,10 +565,11 @@ class MethodDefinition:
             )
 
         formatted: Dict[str, Parameter] = {}
-
+        var_kw = []
         for name, param in parameter_map.items():
             if name == "extra_params":
                 formatted[name] = Parameter(name="kwargs", kind=Parameter.VAR_KEYWORD)
+                var_kw.append(name)
             elif name == "provider_choices":
                 fields = param.annotation.__args__[0].__dataclass_fields__
                 field = fields["provider"]
@@ -620,12 +623,14 @@ class MethodDefinition:
 
                 formatted[name] = Parameter(
                     name=name,
-                    kind=Parameter.POSITIONAL_OR_KEYWORD,
+                    kind=param.kind,
                     annotation=updated_type,
                     default=param.default,
                 )
+                if param.kind == Parameter.VAR_KEYWORD:
+                    var_kw.append(name)
 
-        return MethodDefinition.reorder_params(params=formatted)
+        return MethodDefinition.reorder_params(params=formatted, var_kw=var_kw)
 
     @staticmethod
     def add_field_custom_annotations(
@@ -783,13 +788,18 @@ class MethodDefinition:
             code += "        simplefilter('always', DeprecationWarning)\n"
             code += f"""        warn("{deprecation_message}", category=DeprecationWarning, stacklevel=2)\n\n"""
 
-        extra_info = {}
+        info = {}
 
         code += "        return self._run(\n"
         code += f"""            "{path}",\n"""
         code += "            **filter_inputs(\n"
         for name, param in parameter_map.items():
             if name == "extra_params":
+                fields = param.annotation.__args__[0].__dataclass_fields__
+                values = {k: k for k in fields}
+                for k in values:
+                    if extra := MethodDefinition.get_extra(fields[k]):
+                        info[k] = extra
                 code += f"                {name}=kwargs,\n"
             elif name == "provider_choices":
                 field = param.annotation.__args__[0].__dataclass_fields__["provider"]
@@ -803,19 +813,18 @@ class MethodDefinition:
                 code += "                },\n"
             elif MethodDefinition.is_annotated_dc(param.annotation):
                 fields = param.annotation.__args__[0].__dataclass_fields__
-                value = {k: k for k in fields}
+                values = {k: k for k in fields}
                 code += f"                {name}={{\n"
-                for k, v in value.items():
+                for k, v in values.items():
                     code += f'                    "{k}": {v},\n'
-                    # TODO: Extend this to extra_params
                     if extra := MethodDefinition.get_extra(fields[k]):
-                        extra_info[k] = extra
+                        info[k] = extra
                 code += "                },\n"
             else:
                 code += f"                {name}={name},\n"
 
-        if extra_info:
-            code += f"                extra_info={extra_info},\n"
+        if info:
+            code += f"                info={info},\n"
 
         if MethodDefinition.is_data_processing_function(path):
             code += "                data_processing=True,\n"
