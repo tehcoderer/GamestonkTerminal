@@ -37,7 +37,7 @@ class ROUTER_currency(Container):
                 description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
             ),
         ] = None,
-        **kwargs,
+        **kwargs
     ) -> OBBject:
         """Currency Search.
 
@@ -144,7 +144,7 @@ class ROUTER_currency(Container):
                 },
                 standard_params={},
                 extra_params=kwargs,
-            ),
+            )
         )
 
     @exception_handler
@@ -175,7 +175,7 @@ class ROUTER_currency(Container):
                 description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
             ),
         ] = None,
-        **kwargs,
+        **kwargs
     ) -> OBBject:
         """Snapshots of currency exchange rates from an indirect or direct perspective of a base currency.
 
@@ -266,5 +266,5 @@ class ROUTER_currency(Container):
                 },
                 extra_params=kwargs,
                 info={"base": {"multiple_items_allowed": ["fmp"]}},
-            ),
+            )
         )

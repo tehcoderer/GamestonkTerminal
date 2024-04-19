@@ -3343,7 +3343,7 @@ class ROUTER_equity_fundamental(Container):
         ----------
         symbol : str
             Symbol to get data for.
-        period : Literal['annual', 'quarter']
+        period : Literal['quarter', 'annual']
             Time period of the data to return.
         structure : Literal['hierarchical', 'flat']
             Structure of the returned data.
@@ -3432,7 +3432,7 @@ class ROUTER_equity_fundamental(Container):
         ----------
         symbol : str
             Symbol to get data for.
-        period : Literal['annual', 'quarter']
+        period : Literal['quarter', 'annual']
             Time period of the data to return.
         structure : Literal['hierarchical', 'flat']
             Structure of the returned data.

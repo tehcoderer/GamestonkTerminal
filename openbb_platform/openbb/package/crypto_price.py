@@ -43,7 +43,7 @@ class ROUTER_crypto_price(Container):
                 description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
             ),
         ] = None,
-        **kwargs,
+        **kwargs
     ) -> OBBject:
         """Get historical price data for cryptocurrency pair(s) within a provider.
 
@@ -145,5 +145,5 @@ class ROUTER_crypto_price(Container):
                         ]
                     }
                 },
-            ),
+            )
         )

@@ -37,19 +37,15 @@ def logging_service():
     mock_setup_handlers = Mock()
     mock_log_startup = Mock()
 
-    with (
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingSettings",
-            MockLoggingSettings,
-        ),
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingService._setup_handlers",
-            mock_setup_handlers,
-        ),
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingService._log_startup",
-            mock_log_startup,
-        ),
+    with patch(
+        "openbb_core.app.logs.logging_service.LoggingSettings",
+        MockLoggingSettings,
+    ), patch(
+        "openbb_core.app.logs.logging_service.LoggingService._setup_handlers",
+        mock_setup_handlers,
+    ), patch(
+        "openbb_core.app.logs.logging_service.LoggingService._log_startup",
+        mock_log_startup,
     ):
         _logging_service = LoggingService(
             system_settings=mock_system_settings,
@@ -66,19 +62,15 @@ def test_correctly_initialized():
     mock_setup_handlers = Mock()
     mock_log_startup = Mock()
 
-    with (
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingSettings",
-            MockLoggingSettings,
-        ),
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingService._setup_handlers",
-            mock_setup_handlers,
-        ),
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingService._log_startup",
-            mock_log_startup,
-        ),
+    with patch(
+        "openbb_core.app.logs.logging_service.LoggingSettings",
+        MockLoggingSettings,
+    ), patch(
+        "openbb_core.app.logs.logging_service.LoggingService._setup_handlers",
+        mock_setup_handlers,
+    ), patch(
+        "openbb_core.app.logs.logging_service.LoggingService._log_startup",
+        mock_log_startup,
     ):
         LoggingService(
             system_settings=mock_system_settings,
@@ -186,13 +178,10 @@ def test_log(
     custom_headers,
 ):
     """Test the log method."""
-    with (
-        patch(
-            "openbb_core.app.logs.logging_service.LoggingSettings",
-            MockLoggingSettings,
-        ),
-        patch("logging.getLogger") as mock_get_logger,
-    ):
+    with patch(
+        "openbb_core.app.logs.logging_service.LoggingSettings",
+        MockLoggingSettings,
+    ), patch("logging.getLogger") as mock_get_logger:
         if route == "login":
             with patch(
                 "openbb_core.app.logs.logging_service.LoggingService._log_startup"

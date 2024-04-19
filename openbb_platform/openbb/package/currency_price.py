@@ -43,7 +43,7 @@ class ROUTER_currency_price(Container):
                 description="The provider to use for the query, by default None.\n    If None, the provider specified in defaults is selected or 'fmp' if there is\n    no default."
             ),
         ] = None,
-        **kwargs,
+        **kwargs
     ) -> OBBject:
         """Currency Historical Price. Currency historical data.
 
@@ -148,5 +148,5 @@ class ROUTER_currency_price(Container):
                         ]
                     }
                 },
-            ),
+            )
         )
