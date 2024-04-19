@@ -22,14 +22,6 @@ class MockDataframe:
 mock_dataframe = MockDataframe()
 
 
-class MockDataframe:
-    def __init__(self):
-        self.columns = ["column1", "column2"]
-
-
-mock_dataframe = MockDataframe()
-
-
 @pytest.fixture()
 def obbject():
     """Mock OOBject."""
