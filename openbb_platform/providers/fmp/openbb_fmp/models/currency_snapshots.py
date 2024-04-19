@@ -2,7 +2,7 @@
 
 # pylint: disable=unused-argument
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Dict, List, Optional
 
 from openbb_core.provider.abstract.fetcher import Fetcher
@@ -143,7 +143,7 @@ class FMPCurrencySnapshotsFetcher(
             if len(temp) > 0:
                 # Convert the Unix timestamp to a datetime.
                 temp.timestamp = temp.timestamp.apply(
-                    lambda x: datetime.fromtimestamp(x)
+                    lambda x: datetime.fromtimestamp(x, UTC)
                 )
                 new_df = concat([new_df, temp])
             if len(new_df) == 0:
